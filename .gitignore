@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Temp files
+*.tmp
+*.temp
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Environment files
+.env
+.env.*
+
+# Local system files
+Thumbs.db
+
+text_to_json.py
