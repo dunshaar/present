@@ -647,8 +647,7 @@ section[id] {
 }
 
 .hero-grid,
-.excited-grid,
-.contract-grid {
+.excited-grid {
     display: grid;
     grid-template-columns: 1.05fr 0.95fr;
     gap: 40px;
@@ -681,11 +680,10 @@ section[id] {
 .story-card,
 .poem-card,
 .voice-card,
-.contract-preview,
 .excited-photo-card,
-.pdf-preview-card,
 .final-card,
-.playlist-card {
+.playlist-card,
+.contract-image-card {
     position: relative;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.64));
     backdrop-filter: blur(16px);
@@ -826,7 +824,8 @@ section[id] {
 
 .story-card,
 .voice-card,
-.poem-card {
+.poem-card,
+.contract-image-card {
     border-radius: var(--radius-xl);
     overflow: hidden;
     transition:
@@ -838,10 +837,10 @@ section[id] {
 .story-card:hover,
 .voice-card:hover,
 .poem-card:hover,
-.contract-preview:hover,
 .excited-photo-card:hover,
 .final-card:hover,
-.playlist-card:hover {
+.playlist-card:hover,
+.contract-image-card:hover {
     transform: translateY(-8px);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.95),
@@ -886,7 +885,6 @@ section[id] {
 .story-card-body,
 .voice-card,
 .poem-card,
-.contract-copy,
 .final-card {
     padding: 26px;
 }
@@ -900,8 +898,7 @@ section[id] {
 }
 
 .story-card-body p,
-.voice-card p,
-.contract-copy p {
+.voice-card p {
     margin: 0;
     color: var(--text-soft);
     line-height: 1.78;
@@ -1130,64 +1127,21 @@ section[id] {
     margin-top: 18px;
 }
 
-.contract-points {
-    margin: 24px 0;
+.contract-images {
     display: grid;
-    gap: 12px;
+    gap: 24px;
+    grid-template-columns: 1fr 1fr;
 }
 
-.contract-point {
-    padding: 15px 16px;
-    border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.74));
-    border: 1px solid rgba(124, 86, 97, 0.08);
-    color: var(--text-soft);
-    line-height: 1.72;
-    box-shadow: var(--shadow-sm);
+.contract-image-card {
+    padding: 14px;
 }
 
-.contract-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-}
-
-.contract-preview {
-    border-radius: 36px;
-    padding: 26px;
-}
-
-.pdf-preview-card {
-    border-radius: 28px;
-    padding: 18px;
-}
-
-.pdf-preview-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: var(--text-soft);
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 18px;
-}
-
-.pdf-preview-body {
-    min-height: 280px;
-    border-radius: 24px;
-    border: 1px solid rgba(124, 86, 97, 0.08);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 246, 243, 0.92));
-    display: grid;
-    place-items: center;
-    text-align: center;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-.pdf-icon {
-    font-size: 56px;
-    margin-bottom: 10px;
+.contract-image-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 20px;
 }
 
 .playlist-card {
@@ -1269,17 +1223,6 @@ section[id] {
     max-height: 82vh;
     object-fit: contain;
     border-radius: 20px;
-}
-
-.contract-modal-content {
-    height: min(88vh, 920px);
-}
-
-.contract-modal-content iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
 }
 
 .modal-close {
@@ -1409,8 +1352,7 @@ section[id] {
 @media (max-width: 1120px) {
 
     .hero-grid,
-    .excited-grid,
-    .contract-grid {
+    .excited-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1425,7 +1367,8 @@ section[id] {
     .hero-dates,
     .story-grid,
     .voice-grid,
-    .poems-grid {
+    .poems-grid,
+    .contract-images {
         grid-template-columns: 1fr 1fr;
     }
 
@@ -1480,7 +1423,8 @@ section[id] {
     .story-grid,
     .voice-grid,
     .poems-grid,
-    .gallery-grid {
+    .gallery-grid,
+    .contract-images {
         grid-template-columns: 1fr;
     }
 
@@ -1564,14 +1508,11 @@ section[id] {
     .story-card-body,
     .voice-card,
     .poem-card,
-    .contract-copy,
-    .contract-preview,
     .final-card {
         padding: 22px 18px;
     }
 
-    .hero-actions,
-    .contract-actions {
+    .hero-actions {
         flex-direction: column;
     }
 

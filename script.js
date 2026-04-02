@@ -23,15 +23,15 @@ const imageModal = document.getElementById("imageModal");
 const modalImage = document.getElementById("modalImage");
 const closeImageModal = document.getElementById("closeImageModal");
 
-const contractModal = document.getElementById("contractModal");
-const openContractModal = document.getElementById("openContractModal");
-const closeContractModal = document.getElementById("closeContractModal");
-
 const scrollToTopBtn = document.getElementById("scrollToTopBtn");
 
 const brandSecret = document.getElementById("brandSecret");
 const secretMessage = document.getElementById("secretMessage");
 const heartRain = document.getElementById("heartRain");
+
+const poemsContainer = document.getElementById("poemsContainer");
+const voicesContainer = document.getElementById("voicesContainer");
+const timelineContainer = document.getElementById("timelineContainer");
 
 let currentPoemAudio = null;
 let currentPoemButton = null;
@@ -40,7 +40,17 @@ let countdownInterval = null;
 let secretClicks = 0;
 let secretResetTimeout = null;
 
-/* ---------- TEXT.JS SECTION ---------- */
+/* ---------- HELPERS ---------- */
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+/* ---------- TEXT.JS SECTIONS ---------- */
 function applyExcitedSectionTexts() {
     if (typeof excitedSectionTexts === "undefined") return;
 
@@ -51,6 +61,133 @@ function applyExcitedSectionTexts() {
     if (title) title.textContent = excitedSectionTexts.title || "";
     if (text) text.textContent = excitedSectionTexts.text || "";
     if (caption) caption.textContent = excitedSectionTexts.caption || "";
+}
+
+function applyRelationshipStats() {
+    if (typeof relationshipStats === "undefined") return;
+
+    const met = document.getElementById("heroDateMet");
+    const relationship = document.getElementById("heroDateRelationship");
+    const statLabel = document.getElementById("heroStatLabel");
+    const statValue = document.getElementById("heroStatValue");
+
+    if (met) met.textContent = relationshipStats.dateMet || "";
+    if (relationship) relationship.textContent = relationshipStats.relationshipStarted || "";
+    if (statLabel) statLabel.textContent = relationshipStats.heroLabel || "";
+    if (statValue) statValue.textContent = relationshipStats.heroValue || "";
+}
+
+function renderTimeline() {
+    if (!timelineContainer || typeof timelineData === "undefined") return;
+
+    timelineContainer.innerHTML = timelineData.map((item) => {
+        return `
+            <article class="timeline-item reveal">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-date">${escapeHtml(item.date)}</span>
+                    <h3>${escapeHtml(item.title)}</h3>
+                    <p>${escapeHtml(item.text)}</p>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+function renderPoems() {
+    if (!poemsContainer || typeof poemsData === "undefined") return;
+
+    poemsContainer.innerHTML = poemsData.map((poem) => {
+        const poemHtml = poem.lines.map((line) => {
+            if (line === "") return "<br />";
+            return `<p>${escapeHtml(line)}</p>`;
+        }).join("");
+
+        return `
+            <article class="poem-card reveal">
+                <h3>${escapeHtml(poem.title)}</h3>
+                <div class="poem-body">
+                    ${poemHtml}
+                </div>
+                <div class="poem-audio">
+                    <button class="audio-button" data-audio="${escapeHtml(poem.audio)}" type="button">
+                        Послушать моим голосом
+                    </button>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+function renderVoiceNotes() {
+    if (!voicesContainer || typeof voiceNotesData === "undefined") return;
+
+    voicesContainer.innerHTML = voiceNotesData.map((item) => {
+        return `
+            <article class="voice-card reveal">
+                <h3>${escapeHtml(item.title)}</h3>
+                <p>${escapeHtml(item.text)}</p>
+                <audio controls preload="none">
+                    <source src="${escapeHtml(item.audio)}" type="audio/ogg" />
+                </audio>
+            </article>
+        `;
+    }).join("");
+}
+
+function bindPoemAudioButtons() {
+    document.querySelectorAll(".audio-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            const audioPath = button.dataset.audio;
+            if (!audioPath) return;
+
+            if (currentPoemButton === button && currentPoemAudio && !currentPoemAudio.paused) {
+                currentPoemAudio.pause();
+                currentPoemAudio.currentTime = 0;
+                button.classList.remove("playing");
+                button.textContent = "Послушать моим голосом";
+                currentPoemAudio = null;
+                currentPoemButton = null;
+                resumeBgMusic();
+                return;
+            }
+
+            if (currentPoemAudio) {
+                currentPoemAudio.pause();
+                currentPoemAudio.currentTime = 0;
+            }
+
+            if (currentPoemButton) {
+                currentPoemButton.classList.remove("playing");
+                currentPoemButton.textContent = "Послушать моим голосом";
+            }
+
+            pauseBgMusic();
+
+            const poemAudio = new Audio(audioPath);
+            currentPoemAudio = poemAudio;
+            currentPoemButton = button;
+
+            button.classList.add("playing");
+            button.textContent = "Остановить запись";
+
+            poemAudio.play().catch(() => {
+                button.classList.remove("playing");
+                button.textContent = "Послушать моим голосом";
+                currentPoemAudio = null;
+                currentPoemButton = null;
+                resumeBgMusic();
+            });
+
+            poemAudio.addEventListener("ended", () => {
+                button.classList.remove("playing");
+                button.textContent = "Послушать моим голосом";
+                currentPoemAudio = null;
+                currentPoemButton = null;
+                resumeBgMusic();
+            });
+        });
+    });
 }
 
 /* ---------- ACCESS ---------- */
@@ -83,7 +220,14 @@ function showSite() {
     unlockFavicon();
     observeReveal();
     applyExcitedSectionTexts();
+    applyRelationshipStats();
+    renderTimeline();
+    renderPoems();
+    renderVoiceNotes();
+    bindPoemAudioButtons();
     setActiveNavLink();
+    initGalleryModal();
+    observeReveal();
 }
 
 function unlockFavicon() {
@@ -190,7 +334,7 @@ window.addEventListener("load", setActiveNavLink);
 
 /* ---------- REVEAL ---------- */
 function observeReveal() {
-    const elements = document.querySelectorAll(".reveal");
+    const elements = document.querySelectorAll(".reveal:not(.in-view)");
 
     const observer = new IntersectionObserver(
         (entries) => {
@@ -240,72 +384,13 @@ musicToggleBtn?.addEventListener("click", async () => {
     }
 });
 
-/* ---------- POEM AUDIOS ---------- */
-document.querySelectorAll(".audio-button").forEach((button) => {
-    button.addEventListener("click", () => {
-        const audioPath = button.dataset.audio;
-        if (!audioPath) return;
-
-        if (currentPoemButton === button && currentPoemAudio && !currentPoemAudio.paused) {
-            currentPoemAudio.pause();
-            currentPoemAudio.currentTime = 0;
-            button.classList.remove("playing");
-            button.textContent = "Послушать моим голосом";
-            currentPoemAudio = null;
-            currentPoemButton = null;
-            resumeBgMusic();
-            return;
-        }
-
-        if (currentPoemAudio) {
-            currentPoemAudio.pause();
-            currentPoemAudio.currentTime = 0;
-        }
-
-        if (currentPoemButton) {
-            currentPoemButton.classList.remove("playing");
-            currentPoemButton.textContent = "Послушать моим голосом";
-        }
-
-        pauseBgMusic();
-
-        const poemAudio = new Audio(audioPath);
-        currentPoemAudio = poemAudio;
-        currentPoemButton = button;
-
-        button.classList.add("playing");
-        button.textContent = "Остановить запись";
-
-        poemAudio.play().catch(() => {
-            button.classList.remove("playing");
-            button.textContent = "Послушать моим голосом";
-            currentPoemAudio = null;
-            currentPoemButton = null;
-            resumeBgMusic();
-        });
-
-        poemAudio.addEventListener("ended", () => {
-            button.classList.remove("playing");
-            button.textContent = "Послушать моим голосом";
-            currentPoemAudio = null;
-            currentPoemButton = null;
-            resumeBgMusic();
-        });
-    });
-});
-
 /* ---------- IMAGE MODAL ---------- */
-document.querySelectorAll(".gallery-card").forEach((card) => {
-    card.addEventListener("click", () => {
-        const full = card.dataset.full;
-        if (!full) return;
-
-        modalImage.src = full;
-        imageModal.classList.add("active");
-        imageModal.setAttribute("aria-hidden", "false");
-        document.body.classList.add("modal-open");
-    });
-});
+function openImageViewer(full) {
+    modalImage.src = full;
+    imageModal.classList.add("active");
+    imageModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+}
 
 function closeImageViewer() {
     imageModal.classList.remove("active");
@@ -314,28 +399,22 @@ function closeImageViewer() {
     document.body.classList.remove("modal-open");
 }
 
+function initGalleryModal() {
+    document.querySelectorAll(".gallery-card").forEach((card) => {
+        if (card.dataset.bound === "true") return;
+        card.dataset.bound = "true";
+
+        card.addEventListener("click", () => {
+            const full = card.dataset.full;
+            if (!full) return;
+            openImageViewer(full);
+        });
+    });
+}
+
 closeImageModal?.addEventListener("click", closeImageViewer);
 imageModal?.addEventListener("click", (event) => {
     if (event.target === imageModal) closeImageViewer();
-});
-
-/* ---------- CONTRACT MODAL ---------- */
-function openContractViewer() {
-    contractModal.classList.add("active");
-    contractModal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("modal-open");
-}
-
-function closeContractViewer() {
-    contractModal.classList.remove("active");
-    contractModal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("modal-open");
-}
-
-openContractModal?.addEventListener("click", openContractViewer);
-closeContractModal?.addEventListener("click", closeContractViewer);
-contractModal?.addEventListener("click", (event) => {
-    if (event.target === contractModal) closeContractViewer();
 });
 
 /* ---------- SCROLL TO TOP ---------- */
@@ -397,7 +476,6 @@ brandSecret?.addEventListener("click", (event) => {
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         closeImageViewer();
-        closeContractViewer();
         nav.classList.remove("open");
     }
 });
