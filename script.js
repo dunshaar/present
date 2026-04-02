@@ -1,5 +1,5 @@
 const PASSWORD = "18.02.2026-22:19";
-const OPEN_DATE = new Date("2026-04-01T00:00:00");
+const OPEN_DATE = new Date("2026-04-18T00:00:00");
 
 const entryScreen = document.getElementById("entryScreen");
 const waitingScreen = document.getElementById("waitingScreen");
@@ -39,6 +39,10 @@ let bgMusicStarted = false;
 let countdownInterval = null;
 let secretClicks = 0;
 let secretResetTimeout = null;
+let currentVoiceAudio = null;
+let currentVoiceElement = null;
+let currentPlaylistIframe = null;
+let playlistPauseBound = false;
 
 /* ---------- HELPERS ---------- */
 function escapeHtml(value) {
@@ -48,6 +52,94 @@ function escapeHtml(value) {
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+}
+function stopCurrentPoemAudio() {
+    if (currentPoemAudio) {
+        currentPoemAudio.pause();
+        currentPoemAudio.currentTime = 0;
+    }
+
+    if (currentPoemButton) {
+        currentPoemButton.classList.remove("playing");
+        currentPoemButton.textContent = "Послушать моим голосом";
+    }
+
+    currentPoemAudio = null;
+    currentPoemButton = null;
+}
+
+function stopCurrentVoiceAudio() {
+    if (currentVoiceElement) {
+        currentVoiceElement.pause();
+        currentVoiceElement.currentTime = 0;
+    }
+
+    currentVoiceAudio = null;
+    currentVoiceElement = null;
+}
+
+function stopAllManagedAudio() {
+    stopCurrentPoemAudio();
+    stopCurrentVoiceAudio();
+}
+
+function bindVoicePlayers() {
+    document.querySelectorAll("#voicesContainer audio").forEach((audio) => {
+        if (audio.dataset.bound === "true") return;
+        audio.dataset.bound = "true";
+
+        audio.addEventListener("play", () => {
+            if (currentVoiceElement && currentVoiceElement !== audio) {
+                currentVoiceElement.pause();
+                currentVoiceElement.currentTime = 0;
+            }
+
+            stopCurrentPoemAudio();
+            pauseBgMusic();
+
+            currentVoiceElement = audio;
+            currentVoiceAudio = audio;
+        });
+
+        audio.addEventListener("ended", () => {
+            if (currentVoiceElement === audio) {
+                currentVoiceElement = null;
+                currentVoiceAudio = null;
+            }
+            resumeBgMusic();
+        });
+
+        audio.addEventListener("pause", () => {
+            setTimeout(() => {
+                const anyVoicePlaying = Array.from(document.querySelectorAll("#voicesContainer audio"))
+                    .some((item) => !item.paused);
+
+                if (!anyVoicePlaying && !currentPoemAudio) {
+                    if (currentVoiceElement === audio) {
+                        currentVoiceElement = null;
+                        currentVoiceAudio = null;
+                    }
+                    resumeBgMusic();
+                }
+            }, 50);
+        });
+    });
+}
+
+function bindPlaylistPause() {
+    if (playlistPauseBound) return;
+
+    const playlistSection = document.getElementById("playlist");
+    if (!playlistSection) return;
+
+    playlistSection.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("iframe")) {
+            stopAllManagedAudio();
+            pauseBgMusic();
+        }
+    });
+
+    playlistPauseBound = true;
 }
 
 /* ---------- TEXT.JS SECTIONS ---------- */
@@ -137,31 +229,21 @@ function renderVoiceNotes() {
 
 function bindPoemAudioButtons() {
     document.querySelectorAll(".audio-button").forEach((button) => {
+        if (button.dataset.bound === "true") return;
+        button.dataset.bound = "true";
+
         button.addEventListener("click", () => {
             const audioPath = button.dataset.audio;
             if (!audioPath) return;
 
             if (currentPoemButton === button && currentPoemAudio && !currentPoemAudio.paused) {
-                currentPoemAudio.pause();
-                currentPoemAudio.currentTime = 0;
-                button.classList.remove("playing");
-                button.textContent = "Послушать моим голосом";
-                currentPoemAudio = null;
-                currentPoemButton = null;
+                stopCurrentPoemAudio();
                 resumeBgMusic();
                 return;
             }
 
-            if (currentPoemAudio) {
-                currentPoemAudio.pause();
-                currentPoemAudio.currentTime = 0;
-            }
-
-            if (currentPoemButton) {
-                currentPoemButton.classList.remove("playing");
-                currentPoemButton.textContent = "Послушать моим голосом";
-            }
-
+            stopCurrentVoiceAudio();
+            stopCurrentPoemAudio();
             pauseBgMusic();
 
             const poemAudio = new Audio(audioPath);
@@ -172,23 +254,18 @@ function bindPoemAudioButtons() {
             button.textContent = "Остановить запись";
 
             poemAudio.play().catch(() => {
-                button.classList.remove("playing");
-                button.textContent = "Послушать моим голосом";
-                currentPoemAudio = null;
-                currentPoemButton = null;
+                stopCurrentPoemAudio();
                 resumeBgMusic();
             });
 
             poemAudio.addEventListener("ended", () => {
-                button.classList.remove("playing");
-                button.textContent = "Послушать моим голосом";
-                currentPoemAudio = null;
-                currentPoemButton = null;
+                stopCurrentPoemAudio();
                 resumeBgMusic();
             });
         });
     });
 }
+
 
 /* ---------- ACCESS ---------- */
 function showEntryScreen() {
@@ -218,16 +295,18 @@ function showSite() {
     document.title = "Хомячок × Зайка ♡";
 
     unlockFavicon();
-    observeReveal();
     applyExcitedSectionTexts();
     applyRelationshipStats();
     renderTimeline();
     renderPoems();
     renderVoiceNotes();
+    bindVoicePlayers();
     bindPoemAudioButtons();
-    setActiveNavLink();
+    bindVoicePlayers();
+    bindPlaylistPause();
     initGalleryModal();
     observeReveal();
+    setActiveNavLink();
 }
 
 function unlockFavicon() {
@@ -370,7 +449,10 @@ function pauseBgMusic() {
 }
 
 function resumeBgMusic() {
-    if (bgMusicStarted) {
+    const anyVoicePlaying = Array.from(document.querySelectorAll("#voicesContainer audio"))
+        .some((item) => !item.paused);
+
+    if (bgMusicStarted && !currentPoemAudio && !anyVoicePlaying) {
         bgMusic.play().catch(() => { });
         musicToggleBtn.textContent = "Выключить музыку";
     }
