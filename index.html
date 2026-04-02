@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>...</title>
+    <meta name="description" content="Закрытая история для Зайки." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Marck+Script&display=swap"
+        rel="stylesheet" />
+
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <audio id="bgMusic" loop preload="auto">
+        <source src="image/base/bg-music.mp3" type="audio/mpeg" />
+    </audio>
+
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- ENTRY -->
+    <section class="entry-screen active" id="entryScreen">
+        <div class="entry-card">
+            <div class="entry-badge">private</div>
+            <h1 class="entry-title">Вход</h1>
+            <p class="entry-text">Это место открывается только по правильному коду.</p>
+
+            <form id="passwordForm" class="password-form" autocomplete="off">
+                <div class="password-field">
+                    <input id="passwordInput" class="password-input" type="password" placeholder="Введите пароль"
+                        autocomplete="off" spellcheck="false" />
+                    <button id="togglePassword" class="password-toggle" type="button" aria-label="Показать пароль">
+                        Показать
+                    </button>
+                </div>
+
+                <button class="primary-button" type="submit">Открыть</button>
+                <p id="passwordError" class="error-text" aria-live="polite"></p>
+            </form>
+        </div>
+    </section>
+
+    <!-- WAITING -->
+    <section class="waiting-screen" id="waitingScreen" aria-hidden="true">
+        <div class="waiting-card">
+            <div class="waiting-heart">♡</div>
+            <h2 class="waiting-title">Ещё не время</h2>
+            <p class="waiting-text">
+                Доступ к нашей истории откроется <strong>18 апреля 2026 в 00:00</strong>.
+            </p>
+            <p class="waiting-subtext">
+                Всё самое важное приходит точно в свой момент.
+            </p>
+            <div class="countdown" id="countdown"></div>
+        </div>
+    </section>
+
+    <!-- SITE -->
+    <div class="site" id="site" aria-hidden="true">
+        <header class="header" id="top">
+            <div class="container header-inner">
+                <a href="#hero" class="brand" id="brandSecret">Хомячок × Зайка</a>
+
+                <button class="nav-toggle" id="navToggle" aria-label="Открыть меню">
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <nav class="nav" id="nav">
+                    <a href="#story-start">Начало</a>
+                    <a href="#timeline">Хронология</a>
+                    <a href="#gallery">Галерея</a>
+                    <a href="#excited-section">Притяжение</a>
+                    <a href="#poems">Стихи</a>
+                    <a href="#voices">Голосовые</a>
+                    <a href="#contract">Договор</a>
+                    <a href="#playlist">Плейлист</a>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <!-- HERO -->
+            <section class="hero section" id="hero">
+                <div class="container hero-grid">
+                    <div class="hero-copy reveal">
+                        <div class="section-kicker">private story archive</div>
+                        <h1 class="hero-title">Хомячок &amp; Зайка</h1>
+                        <p class="hero-lead">
+                            Не просто сайт и не просто подборка моментов. А маленькое закрытое место,
+                            в котором собрана наша история — всё важное, тёплое и живое.
+                        </p>
+
+                        <div class="hero-dates">
+                            <div class="date-card">
+                                <span class="date-label">Дата знакомства</span>
+                                <span class="date-value">21 ноября 2025</span>
+                            </div>
+
+                            <div class="date-card">
+                                <span class="date-label">Начало отношений</span>
+                                <span class="date-value">18 февраля 2026</span>
+                            </div>
+
+                            <div class="date-card">
+                                <span class="date-label">Наша история</span>
+                                <span class="date-value">2 месяца вместе</span>
+                            </div>
+                        </div>
+
+                        <div class="hero-actions">
+                            <button class="primary-button" id="musicToggleBtn" type="button">
+                                Включить музыку
+                            </button>
+                            <a class="ghost-button" href="#story-start">Открыть историю</a>
+                        </div>
+                    </div>
+
+                    <div class="hero-side reveal">
+                        <div class="hero-photo-stack">
+                            <div class="hero-photo-card large">
+                                <img src="image/gallery/photo-soft-1.jpg" alt="Нежное фото" />
+                            </div>
+                            <div class="hero-photo-card small top">
+                                <img src="image/gallery/photo-beauty-1.jpg" alt="Красивое фото" />
+                            </div>
+                            <div class="hero-photo-card small bottom">
+                                <img src="image/gallery/photo-soft-2.jpg" alt="Ещё одно нежное фото" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STORY START -->
+            <section class="section" id="story-start">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker">начало</div>
+                        <h2 class="section-title">С чего всё началось</h2>
+                        <p class="section-text">
+                            Некоторые истории выглядят совсем обычными в самом начале.
+                            Но именно из таких маленьких моментов потом вырастает что-то настоящее.
+                        </p>
+                    </div>
+
+                    <div class="story-grid">
+                        <article class="story-card reveal">
+                            <div class="story-image">
+                                <img src="image/base/chat-start.png" alt="Начало переписки" />
+                            </div>
+                            <div class="story-card-body">
+                                <h3>Первый шаг</h3>
+                                <p>
+                                    Один из тех моментов, которые на вид совсем простые, а по факту
+                                    меняют очень многое.
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="story-card reveal">
+                            <div class="story-image">
+                                <img src="image/base/agreement-yes.png" alt="Согласие" class="agreement-image" />
+                            </div>
+                            <div class="story-card-body">
+                                <h3>Твоё «я готова»</h3>
+                                <p>
+                                    Тот самый момент, после которого всё стало уже не намёком, а реальностью.
+                                </p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TIMELINE -->
+            <section class="section soft-section" id="timeline">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker">хронология</div>
+                        <h2 class="section-title">Наша линия времени</h2>
+                    </div>
+
+                    <div class="timeline">
+                        <article class="timeline-item reveal">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">21 ноября 2025</span>
+                                <h3>Начало знакомства</h3>
+                                <p>Точка, с которой началось всё остальное.</p>
+                            </div>
+                        </article>
+
+                        <article class="timeline-item reveal">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">18 февраля 2026 · 22:19</span>
+                                <h3>Начало отношений</h3>
+                                <p>Момент, в котором «мы» стало не намёком, а реальностью.</p>
+                            </div>
+                        </article>
+
+                        <article class="timeline-item reveal">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">18 марта 2026</span>
+                                <h3>Наша первая маленькая годовщина</h3>
+                                <p>Первый рубеж, который уже захотелось сохранить отдельно.</p>
+                            </div>
+                        </article>
+
+                        <article class="timeline-item reveal">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <span class="timeline-date">18 апреля 2026</span>
+                                <h3>И вот нам уже 2 месяца</h3>
+                                <p>Пока немного. Но уже достаточно, чтобы это стало по-настоящему важным.</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GALLERY -->
+            <section class="section" id="gallery">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker">галерея</div>
+                        <h2 class="section-title">Ты, от которой у меня сбивается дыхание</h2>
+                    </div>
+
+                    <div class="gallery-grid">
+                        <figure class="gallery-card tall reveal" data-full="image/gallery/photo-soft-1.jpg">
+                            <img src="image/gallery/photo-soft-1.jpg" alt="Нежное фото 1" />
+                            <figcaption>Нежность</figcaption>
+                        </figure>
+
+                        <figure class="gallery-card reveal" data-full="image/gallery/photo-beauty-1.jpg">
+                            <img src="image/gallery/photo-beauty-1.jpg" alt="Красивое фото 1" />
+                            <figcaption>Красота</figcaption>
+                        </figure>
+
+                        <figure class="gallery-card reveal" data-full="image/gallery/photo-beauty-2.jpg">
+                            <img src="image/gallery/photo-beauty-2.jpg" alt="Красивое фото 2" />
+                            <figcaption>Магнетизм</figcaption>
+                        </figure>
+
+                        <figure class="gallery-card reveal" data-full="image/gallery/photo-morning.jpg">
+                            <img src="image/gallery/photo-morning.jpg" alt="Утреннее фото" />
+                            <figcaption>Только проснулась</figcaption>
+                        </figure>
+
+                        <figure class="gallery-card reveal" data-full="image/gallery/photo-soft-2.jpg">
+                            <img src="image/gallery/photo-soft-2.jpg" alt="Нежное фото 2" />
+                            <figcaption>Мягкость</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EXCITED SECTION -->
+            <section class="section soft-section" id="excited-section">
+                <div class="container">
+                    <div class="excited-grid">
+                        <div class="excited-copy reveal">
+                            <div class="section-kicker">притяжение</div>
+                            <h2 class="section-title" id="excitedTitle">Тут будет твой заголовок</h2>
+                            <p class="section-text" id="excitedText">
+                                Тут будет твой текст для этого раздела.
+                            </p>
+                            <div class="excited-note" id="excitedCaption">
+                                Тут будет твоя подпись к фото.
+                            </div>
+                        </div>
+
+                        <div class="excited-photo-card reveal">
+                            <img src="image/gallery/photo-excited.jpg" alt="Особенное фото" />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- POEMS -->
+            <section class="section" id="poems">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker">стихи</div>
+                        <h2 class="section-title">Мои стихи для тебя</h2>
+                        <p class="section-text">
+                            Здесь лежит то, что я когда-то написал для тебя. А под каждым стихотворением —
+                            запись моим голосом.
+                        </p>
+                    </div>
+
+                    <div class="poems-grid">
+                        <article class="poem-card reveal">
+                            <h3>Любовь на расстоянии</h3>
+                            <div class="poem-body">
+                                <p>Нас разлучили километры и распорядок,</p>
+                                <p>Как будто жизни на два русла развели.</p>
+                                <p>Мне не хватает самого наградного —</p>
+                                <p>Твоей улыбки близко, кожи, теплоты руки.</p>
+                                <br />
+                                <p>Но в этой паузе, где время тянется иначе,</p>
+                                <p>Где голос в трубке — как спасательный трос,</p>
+                                <p>Я понял вдруг, что самое ценное — не встреча,</p>
+                                <p>А то, как ты встречаешь мой любой вопрос.</p>
+                                <br />
+                                <p>Когда я оступаюсь, снова не дотягиваю,</p>
+                                <p>И мир становится жестоким и колким,</p>
+                                <p>Ты не читаешь нотаций. Ты молча принимаешь.</p>
+                                <p>Как земля принимает и дождь, и зной, и гололёд.</p>
+                                <br />
+                                <p>Ты веришь в мою суть, когда поступки кривы,</p>
+                                <p>Ты видишь свет во мне, когда вокруг лишь тень.</p>
+                                <p>Ты — не приговор, ты — оправдание, истина,</p>
+                                <p>И тихая гавань, куда всегда вернусь.</p>
+                                <br />
+                                <p>Любовь моя — не буря, не пожар багровый,</p>
+                                <p>Что ярко вспыхнет и оставит лишь пепел.</p>
+                                <p>Она — как ровное свечение основы.</p>
+                                <p>Даже через расстояния я ею согреваю клетки.</p>
+                                <br />
+                                <p>И пусть сейчас не скрещены наши пальцы,</p>
+                                <p>Мы скреплены иначе — прочнее, вглубь.</p>
+                                <p>Ты — моя тихая правда, мой компас.</p>
+                                <p>И мой обет тебе — не красивые слова, а суть.</p>
+                                <br />
+                                <p>Я не отпущу. Не потому, что держусь силой.</p>
+                                <p>А потому, что ты — часть моего «я».</p>
+                                <p>И эта связь не знает слова «или».</p>
+                                <p>Мы — два полюса одного меридиана.</p>
+                                <p>Разлука для нас — лишь новый способ слышать,</p>
+                                <p>Как бьётся одно сердце на двоих.</p>
+                            </div>
+                            <div class="poem-audio">
+                                <button class="audio-button" data-audio="image/voiceover/poem-love-distance.ogg"
+                                    type="button">
+                                    Послушать моим голосом
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="poem-card reveal">
+                            <h3>Тяготение</h3>
+                            <div class="poem-body">
+                                <p>Мне кажется порой, что я — луна,</p>
+                                <p>А ты — моя планета неизменная.</p>
+                                <p>К тебе меня влечёт не сила сна,</p>
+                                <p>А тяготение, что в мире нет важней.</p>
+                                <br />
+                                <p>Ты — утро, что стучится в мои шторы,</p>
+                                <p>Тихий смех, что лечит от ненастья.</p>
+                                <p>Ты переписала все мои закоулки,</p>
+                                <p>Наполнив жизнь не сумраком, а страстью.</p>
+                                <br />
+                                <p>Любовь моя — не громкая, не броская,</p>
+                                <p>Она — как воздух. Её не замечать.</p>
+                                <p>Но если нет тебя — душа пустует,</p>
+                                <p>И нечем больше даже просто дышать.</p>
+                                <br />
+                                <p>Прости, что я порой бываю странным,</p>
+                                <p>Слова путаю и теряю нить.</p>
+                                <p>Но знай — в любом из своих измерений</p>
+                                <p>Я буду рядом. Мне с тобою — жить.</p>
+                            </div>
+                            <div class="poem-audio">
+                                <button class="audio-button" data-audio="image/voiceover/poem-gravity.ogg"
+                                    type="button">
+                                    Послушать моим голосом
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="poem-card reveal">
+                            <h3>Когда между нами моря</h3>
+                            <div class="poem-body">
+                                <p>За окном дожди, а на сердце — вьюга,</p>
+                                <p>Грусть моя, постой, не гости так долго.</p>
+                                <p>Знаю, хочешь ты быть сейчас со мною,</p>
+                                <p>Но легли моря между нас и горы.</p>
+                                <br />
+                                <p>Ты сидишь в тиши, я пишу в мессенджер:</p>
+                                <p>«Как ты там, держись, я с тобою, слышишь?»</p>
+                                <p>Не могу обнять, не могу согреть,</p>
+                                <p>Но могу любить так, чтоб ты не тлела.</p>
+                                <br />
+                                <p>Пусть сейчас не рядом, пусть экран холодный,</p>
+                                <p>Я твой самый близкий, самый верный, родный.</p>
+                                <p>Все твои печали я рукой сотру,</p>
+                                <p>Просто набери мне — сразу к ним приду.</p>
+                                <br />
+                                <p>Это не навечно, это просто мили,</p>
+                                <p>Мы с тобой однажды всё, что есть, проплыли.</p>
+                                <p>Я в твоём сердечке, ты в моём навеки,</p>
+                                <p>Не грусти, родная, вместе мы — навеки.</p>
+                            </div>
+                            <div class="poem-audio">
+                                <button class="audio-button" data-audio="image/voiceover/poem-seas-between-us.ogg"
+                                    type="button">
+                                    Послушать моим голосом
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="poem-card reveal">
+                            <h3>Давай мириться</h3>
+                            <div class="poem-body">
+                                <p>Вот снова я раздул каприз,</p>
+                                <p>На ровном месте — целый кризис.</p>
+                                <p>Ходил, молчал, надулся вниз,</p>
+                                <p>Как будто в ссоре — высший призис.</p>
+                                <br />
+                                <p>Обида глупая растёт,</p>
+                                <p>А ты в ответ — и тоже дуешь.</p>
+                                <p>И два упрямых идиота</p>
+                                <p>Теряют то, чем так живут.</p>
+                                <br />
+                                <p>Но знаешь… В мире, где есть ты,</p>
+                                <p>Мне дурно быть с надутым видом.</p>
+                                <p>Давай простим наши щиты</p>
+                                <p>И станем снова сильным тылом?</p>
+                                <br />
+                                <p>Я не хочу держать в себе</p>
+                                <p>Ни грамма злости, ни протеста.</p>
+                                <p>Лишь быть с тобой, в твоём тепле —</p>
+                                <p>Вот самое святое место.</p>
+                                <br />
+                                <p>Прости, что я усложнил.</p>
+                                <p>Ты — свет, что мне всего дороже.</p>
+                                <p>Я всё… я сдулся. Нет больше сил.</p>
+                                <p>Давай мириться? Ну, пожалуйста, моя любимая.</p>
+                            </div>
+                            <div class="poem-audio">
+                                <button class="audio-button" data-audio="image/voiceover/poem-make-peace.ogg"
+                                    type="button">
+                                    Послушать моим голосом
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="poem-card reveal">
+                            <h3>Всё, что было до тебя</h3>
+                            <div class="poem-body">
+                                <p>Знаешь, а всё, что было не с тобой —</p>
+                                <p>Было так, черновик, репетиция.</p>
+                                <p>Я жил, но каким-то не своим,</p>
+                                <p>Пока ты не начала мне сниться.</p>
+                                <br />
+                                <p>А теперь просыпаюсь — и ты в голове,</p>
+                                <p>Засыпаю — и ты в каждой мысли.</p>
+                                <p>Ты — тот самый свет в моей темноте,</p>
+                                <p>Без которого мы бы не выжили.</p>
+                                <br />
+                                <p>Я люблю тебя так, что порой мне самому</p>
+                                <p>Страшно: как это — столько счастья?</p>
+                                <p>Ты — причина всему, что я в сердце несу,</p>
+                                <p>Ты — защита моя и участие.</p>
+                                <br />
+                                <p>Ты — не просто любовь. Ты — мой дом.</p>
+                                <p>Ты — язык, на котором я говорю с миром.</p>
+                                <p>Ты — всё то, что я назвал потом</p>
+                                <p>Самым главным, святым, неделимым.</p>
+                                <br />
+                                <p>Я твой. Без остатка. Навсегда.</p>
+                                <p>Это даже не клятва — это факт.</p>
+                                <p>Ты — начало, середина, черта,</p>
+                                <p>За которой уже не надо никак.</p>
+                                <br />
+                                <p>Я так тебя люблю — что звёзды замерзают,</p>
+                                <p>Я так тебя люблю — что океаны тают,</p>
+                                <p>Я так тебя люблю — что небу не хватает слов,</p>
+                                <p>Я так тебя люблю.</p>
+                                <p>Люблю.</p>
+                                <p>Без единого сомнения.</p>
+                            </div>
+                            <div class="poem-audio">
+                                <button class="audio-button" data-audio="image/voiceover/poem-before-you.ogg"
+                                    type="button">
+                                    Послушать моим голосом
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="poem-card reveal">
+                            <h3>Когда тебе грустно</h3>
+                            <div class="poem-body">
+                                <p>За окном, быть может, тучи,</p>
+                                <p>В мире серость и дожди,</p>
+                                <p>Но для сердца самый лучший</p>
+                                <p>Свет — когда в порядке ты.</p>
+                                <br />
+                                <p>Если грустно — я придумал</p>
+                                <p>Миллион способов согреть:</p>
+                                <p>Словом, музыкой, безумством,</p>
+                                <p>Или просто — не болеть.</p>
+                                <br />
+                                <p>Ты устала? Ты разбита?</p>
+                                <p>Настроение ушло?</p>
+                                <p>Помни: ты во мне защита,</p>
+                                <p>Ты — моё тепло.</p>
+                                <br />
+                                <p>Всё, что душит, всё, что давит —</p>
+                                <p>Ветер унесёт с утра.</p>
+                                <p>Ты — единственная в мире,</p>
+                                <p>Для кого поёт душа.</p>
+                                <br />
+                                <p>Обними меня мысленно,</p>
+                                <p>Руку мысленно дай.</p>
+                                <p>Мы с тобою зависимы</p>
+                                <p>Только так — через край.</p>
+                                <br />
+                                <p>Всё пройдет: и холод, и слякоть,</p>
+                                <p>И плохой этот день, и час.</p>
+                                <p>Я с тобой. Я рядом, поняла?</p>
+                                <p>Просто вспомни меня сейчас.</p>
+                            </div>
+                            <div class="poem-audio">
+                                <button class="audio-button" data-audio="image/voiceover/poem-when-youre-sad.ogg"
+                                    type="button">
+                                    Послушать моим голосом
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="poem-card reveal">
+                            <h3>Ты — это всё</h3>
+                            <div class="poem-body">
+                                <p>Когда ты смотришь — тают тучи,</p>
+                                <p>Когда ты дышишь — тает лёд.</p>
+                                <p>В тебе самой — источник лучший,</p>
+                                <p>Что этот мир не устаёт.</p>
+                                <br />
+                                <p>Твои глаза — два океана,</p>
+                                <p>В которых хочется тонуть.</p>
+                                <p>А улыбаешься — и рана</p>
+                                <p>Любая заживает, нуть.</p>
+                                <br />
+                                <p>Ты — музыка без лишней ноты,</p>
+                                <p>Ты — линий чистых красота.</p>
+                                <p>В тебе самой живут коты,</p>
+                                <p>В тебе самой живут мечты,</p>
+                                <p>В тебе самой — моя весна.</p>
+                                <br />
+                                <p>Я мог бы вечность перечислить,</p>
+                                <p>Что в мире делают прекрасным.</p>
+                                <p>Но легче просто написать:</p>
+                                <p>Ты — это всё. И точка. Ясно.</p>
+                            </div>
+                            <div class="poem-audio">
+                                <button class="audio-button" data-audio="image/voiceover/poem-you-are-everything.ogg"
+                                    type="button">
+                                    Послушать моим голосом
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="poem-card reveal">
+                            <h3>Спокойной ночи, родная</h3>
+                            <div class="poem-body">
+                                <p>Я сегодня устал. Не на тебя — на день.</p>
+                                <p>Просто голос стал резче, а мысли — рвань.</p>
+                                <p>Я сказал про вниманье… Какая чушь!</p>
+                                <p>Словно ты не единственная, кем дышу.</p>
+                                <br />
+                                <p>Мне не «чего-то» не хватает — тебя не хватает.</p>
+                                <p>И когда ты далеко — даже часы не считаю,</p>
+                                <p>А сжимаюсь внутри, как пружина.</p>
+                                <p>Прости. Я дурак. Я неправ. Мне не стыдно признать —</p>
+                                <p>Что вниманье твоё — это воздух и благодать,</p>
+                                <p>А мои капризы — сплошная дурацкая льдина.</p>
+                                <br />
+                                <p>Не уходи спать обиженной. Знаешь ведь сама:</p>
+                                <p>Я без твоего «спокойной ночи» — как без рук.</p>
+                                <p>Я наговорил ерунды. Я устал. Но люблю.</p>
+                                <p>Вот и всё.</p>
+                                <p>Спокойной ночи, родная.</p>
+                                <p>Просто будем считать это глупым эпизодом.</p>
+                                <p>Ты — главное.</p>
+                                <p>Остальное — погода.</p>
+                            </div>
+                            <div class="poem-audio">
+                                <button class="audio-button" data-audio="image/voiceover/poem-good-night.ogg"
+                                    type="button">
+                                    Послушать моим голосом
+                                </button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VOICES -->
+            <section class="section soft-section" id="voices">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker">голос</div>
+                        <h2 class="section-title">Твои голосовые</h2>
+                        <p class="section-text">
+                            Те самые маленькие живые кусочки, в которых ты звучишь по-настоящему.
+                        </p>
+                    </div>
+
+                    <div class="voice-grid">
+                        <article class="voice-card reveal">
+                            <h3>Голосовое 01</h3>
+                            <p>Один из тех моментов, которые хочется переслушивать ещё раз.</p>
+                            <audio controls preload="none">
+                                <source src="image/voice/voice-1.ogg" type="audio/ogg" />
+                            </audio>
+                        </article>
+
+                        <article class="voice-card reveal">
+                            <h3>Голосовое 02</h3>
+                            <p>Ещё один кусочек тебя, который я решил сохранить здесь.</p>
+                            <audio controls preload="none">
+                                <source src="image/voice/voice-2.ogg" type="audio/ogg" />
+                            </audio>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONTRACT -->
+            <section class="section" id="contract">
+                <div class="container">
+                    <div class="contract-grid">
+                        <div class="contract-copy reveal">
+                            <div class="section-kicker">договор</div>
+                            <h2 class="section-title">Договор о взаимном выборе</h2>
+                            <p class="section-text">
+                                Здесь лежит уже не просто память, а официальный романтический документ,
+                                который тоже стал частью нашей истории.
+                            </p>
+
+                            <div class="contract-points">
+                                <div class="contract-point">Пункт 1. Ты слишком глубоко вписана в мою жизнь.</div>
+                                <div class="contract-point">Пункт 2. Назад это уже не разворачивается.</div>
+                                <div class="contract-point">Пункт 3. Всё самое важное между нами остаётся в силе.</div>
+                            </div>
+
+                            <div class="contract-actions">
+                                <a class="primary-button" href="image/base/contract.pdf" target="_blank"
+                                    rel="noopener noreferrer">
+                                    Открыть договор
+                                </a>
+                                <button class="ghost-button" type="button" id="openContractModal">
+                                    Смотреть внутри сайта
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="contract-preview reveal">
+                            <div class="pdf-preview-card">
+                                <div class="pdf-preview-top">
+                                    <span>PDF</span>
+                                    <span>2 страницы</span>
+                                </div>
+                                <div class="pdf-preview-body">
+                                    <div class="pdf-icon">📄</div>
+                                    <p>contract.pdf</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PLAYLIST -->
+            <section class="section soft-section" id="playlist">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker">музыка</div>
+                        <h2 class="section-title">То, что звучит как мы</h2>
+                        <p class="section-text">
+                            Наш плейлист, в котором тоже лежит часть этой истории.
+                        </p>
+                    </div>
+
+                    <div class="playlist-card reveal">
+                        <iframe frameborder="0" allow="clipboard-write" style="border:none;width:100%;height:520px;"
+                            src="https://music.yandex.ru/iframe/playlist/GO01102010GO/1025"
+                            title="Плейлист Яндекс Музыки"></iframe>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FINAL -->
+            <section class="section final-section" id="final">
+                <div class="container">
+                    <div class="final-card reveal">
+                        <div class="section-kicker">финал</div>
+                        <h2 class="section-title">И это только начало</h2>
+                        <p class="section-text">
+                            Пока что это всё. Но мне очень хочется, чтобы совсем скоро наша история
+                            продолжалась, пополнялась новыми моментами и становилась всё больше и больше.
+                        </p>
+                        <button class="primary-button" id="scrollToTopBtn" type="button">Вернуться наверх</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- GALLERY MODAL -->
+    <div class="modal image-modal" id="imageModal" aria-hidden="true">
+        <button class="modal-close" id="closeImageModal" aria-label="Закрыть">×</button>
+        <div class="modal-content image-modal-content">
+            <img id="modalImage" src="" alt="Увеличенное изображение" />
+        </div>
+    </div>
+
+    <!-- CONTRACT MODAL -->
+    <div class="modal contract-modal" id="contractModal" aria-hidden="true">
+        <button class="modal-close" id="closeContractModal" aria-label="Закрыть">×</button>
+        <div class="modal-content contract-modal-content">
+            <iframe src="image/base/contract.pdf" title="Договор" loading="lazy"></iframe>
+        </div>
+    </div>
+
+    <!-- SECRET -->
+    <div class="secret-message" id="secretMessage" aria-hidden="true">
+        <div class="secret-message-card">
+            <div class="secret-message-kicker">secret</div>
+            <div class="secret-message-text">
+                Ты уже слишком глубоко в моём сердце, чтобы оттуда выбраться ♡
+            </div>
+        </div>
+    </div>
+
+    <div class="heart-rain" id="heartRain" aria-hidden="true"></div>
+
+    <script src="text.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
