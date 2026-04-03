@@ -38,6 +38,7 @@ let currentPoemButton = null;
 let bgMusicStarted = false;
 let countdownInterval = null;
 let secretClicks = 0;
+let waitingAutoOpened = false;
 let secretResetTimeout = null;
 let currentVoiceAudio = null;
 let currentVoiceElement = null;
@@ -302,7 +303,6 @@ function showSite() {
     renderVoiceNotes();
     bindVoicePlayers();
     bindPoemAudioButtons();
-    bindVoicePlayers();
     bindPlaylistPause();
     initGalleryModal();
     observeReveal();
@@ -352,25 +352,30 @@ togglePassword?.addEventListener("click", () => {
 
 function startCountdown() {
     if (countdownInterval) clearInterval(countdownInterval);
-
     function updateCountdown() {
         const now = new Date();
         const diff = OPEN_DATE.getTime() - now.getTime();
-
         if (diff <= 0) {
             countdown.textContent = "Время пришло.";
-            clearInterval(countdownInterval);
+            if (!waitingAutoOpened) {
+                waitingAutoOpened = true;
+                clearInterval(countdownInterval);
+                setTimeout(() => {
+                    waitingScreen.classList.add("fade-out");
+                    setTimeout(() => {
+                        showSite();
+                        waitingScreen.classList.remove("fade-out");
+                    }, 900);
+                }, 3000);
+            }
             return;
         }
-
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
-
         countdown.textContent = `${days} д ${hours} ч ${minutes} м ${seconds} с`;
     }
-
     updateCountdown();
     countdownInterval = setInterval(updateCountdown, 1000);
 }

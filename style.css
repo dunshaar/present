@@ -1534,3 +1534,29 @@ section[id] {
         padding: 0 12px;
     }
 }
+
+.waiting-screen {
+    transition:
+        opacity 0.9s ease,
+        visibility 0.9s ease,
+        transform 0.9s ease;
+}
+
+.waiting-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.02);
+}
+
+.waiting-card {
+    transition:
+        transform 0.9s ease,
+        opacity 0.9s ease,
+        filter 0.9s ease;
+}
+
+.waiting-screen.fade-out .waiting-card {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+    filter: blur(10px);
+}
