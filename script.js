@@ -1,5 +1,5 @@
 const PASSWORD = "18.02.2026-22:19";
-const OPEN_DATE = new Date("2026-04-08T01:00:00");
+const OPEN_DATE = new Date("2026-04-18T00:00:00");
 
 const entryScreen = document.getElementById("entryScreen");
 const waitingScreen = document.getElementById("waitingScreen");
