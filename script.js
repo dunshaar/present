@@ -1,4 +1,4 @@
-const PASSWORD = "18.02.2026-22:19";
+const PASSWORD = "18.02.2026";
 const OPEN_DATE = new Date("2026-06-21T00:00:00");
 
 const entryScreen = document.getElementById("entryScreen");
@@ -31,7 +31,14 @@ const heartRain = document.getElementById("heartRain");
 
 const poemsContainer = document.getElementById("poemsContainer");
 const voicesContainer = document.getElementById("voicesContainer");
+const storyCardsContainer = document.getElementById("storyCardsContainer");
 const timelineContainer = document.getElementById("timelineContainer");
+const galleryContainer = document.getElementById("galleryContainer");
+const reasonsContainer = document.getElementById("reasonsContainer");
+const openWhenContainer = document.getElementById("openWhenContainer");
+const loveStatsContainer = document.getElementById("loveStatsContainer");
+const futurePlansContainer = document.getElementById("futurePlansContainer");
+const finalLetter = document.getElementById("finalLetter");
 
 let currentPoemAudio = null;
 let currentPoemButton = null;
@@ -54,6 +61,93 @@ function escapeHtml(value) {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
 }
+
+function pluralizeDays(value) {
+    const absValue = Math.abs(value);
+    const lastTwo = absValue % 100;
+    const last = absValue % 10;
+
+    if (lastTwo >= 11 && lastTwo <= 14) return "дней";
+    if (last === 1) return "день";
+    if (last >= 2 && last <= 4) return "дня";
+    return "дней";
+}
+
+function getCalendarDayDiff(dateValue, mode = "since") {
+    const targetDate = new Date(dateValue);
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const targetStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    const dayMs = 1000 * 60 * 60 * 24;
+    const diff = Math.floor((todayStart.getTime() - targetStart.getTime()) / dayMs);
+
+    if (mode === "until") {
+        return Math.max(Math.ceil((targetStart.getTime() - todayStart.getTime()) / dayMs), 0);
+    }
+
+    return Math.max(diff, 0);
+}
+
+function getUiText(key, fallback = "") {
+    if (typeof siteContent === "undefined") return fallback;
+    return siteContent.ui?.[key] || fallback;
+}
+
+function setTextById(id, value) {
+    const element = document.getElementById(id);
+
+    if (!element || typeof value === "undefined") return;
+
+    element.textContent = value;
+}
+
+function applySiteContent(mode = "initial") {
+    if (typeof siteContent === "undefined") return;
+
+    if (siteContent.page?.description) {
+        const description = document.querySelector('meta[name="description"]');
+        if (description) description.content = siteContent.page.description;
+    }
+
+    if (mode === "unlocked") {
+        document.title = siteContent.page?.unlockedTitle || document.title;
+    } else {
+        document.title = siteContent.page?.initialTitle || document.title;
+    }
+
+    Object.entries(siteContent.texts || {}).forEach(([id, value]) => {
+        setTextById(id, value);
+    });
+
+    if (passwordInput && siteContent.ui?.passwordPlaceholder) {
+        passwordInput.placeholder = siteContent.ui.passwordPlaceholder;
+    }
+
+    if (togglePassword && siteContent.ui?.showPassword) {
+        togglePassword.textContent = siteContent.ui.showPassword;
+    }
+
+    setTextById("passwordSubmitBtn", siteContent.ui?.openButton);
+    setTextById("musicToggleBtn", siteContent.ui?.musicOn);
+}
+
+function toggleSectionVisibility(sectionId, isVisible) {
+    const section = document.getElementById(sectionId);
+
+    if (!section) return;
+
+    section.hidden = !isVisible;
+}
+
+function syncNavVisibility() {
+    navLinks.forEach((link) => {
+        const sectionId = link.getAttribute("href")?.replace("#", "");
+        const section = sectionId ? document.getElementById(sectionId) : null;
+
+        if (section) link.hidden = section.hidden;
+    });
+}
+
 function stopCurrentPoemAudio() {
     if (currentPoemAudio) {
         currentPoemAudio.pause();
@@ -62,7 +156,7 @@ function stopCurrentPoemAudio() {
 
     if (currentPoemButton) {
         currentPoemButton.classList.remove("playing");
-        currentPoemButton.textContent = "Послушать моим голосом";
+        currentPoemButton.textContent = getUiText("poemPlay", "Послушать моим голосом");
     }
 
     currentPoemAudio = null;
@@ -170,8 +264,32 @@ function applyRelationshipStats() {
     if (statValue) statValue.textContent = relationshipStats.heroValue || "";
 }
 
+function renderStoryCards() {
+    if (!storyCardsContainer || typeof storyCardsData === "undefined") return;
+
+    toggleSectionVisibility("story-start", storyCardsData.length > 0);
+
+    storyCardsContainer.innerHTML = storyCardsData.map((item) => {
+        const imageClass = item.imageClass ? ` class="${escapeHtml(item.imageClass)}"` : "";
+
+        return `
+            <article class="story-card reveal">
+                <div class="story-image">
+                    <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.alt || "")}"${imageClass} />
+                </div>
+                <div class="story-card-body">
+                    <h3>${escapeHtml(item.title)}</h3>
+                    <p>${escapeHtml(item.text)}</p>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
 function renderTimeline() {
     if (!timelineContainer || typeof timelineData === "undefined") return;
+
+    toggleSectionVisibility("timeline", timelineData.length > 0);
 
     timelineContainer.innerHTML = timelineData.map((item) => {
         return `
@@ -187,8 +305,139 @@ function renderTimeline() {
     }).join("");
 }
 
+function renderReasons() {
+    if (!reasonsContainer || typeof reasonsData === "undefined") return;
+
+    toggleSectionVisibility("reasons", reasonsData.length > 0);
+
+    reasonsContainer.innerHTML = reasonsData.map((item) => {
+        return `
+            <article class="reason-card reveal">
+                <h3>${escapeHtml(item.title)}</h3>
+                <p>${escapeHtml(item.text)}</p>
+            </article>
+        `;
+    }).join("");
+}
+
+function renderOpenWhenLetters() {
+    if (!openWhenContainer || typeof openWhenData === "undefined") return;
+
+    toggleSectionVisibility("open-when", openWhenData.length > 0);
+
+    openWhenContainer.innerHTML = openWhenData.map((item) => {
+        const paragraphs = item.paragraphs.map((paragraph) => {
+            return `<p>${escapeHtml(paragraph)}</p>`;
+        }).join("");
+
+        return `
+            <article class="open-when-card reveal">
+                <button class="open-when-toggle" type="button" aria-expanded="false">
+                    <span>${escapeHtml(item.title)}</span>
+                    <span class="open-when-action">${escapeHtml(item.button || getUiText("openLetter", "Открыть письмо"))}</span>
+                </button>
+                <div class="open-when-body">
+                    ${paragraphs}
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+function bindOpenWhenLetters() {
+    document.querySelectorAll(".open-when-toggle").forEach((button) => {
+        if (button.dataset.bound === "true") return;
+        button.dataset.bound = "true";
+
+        button.addEventListener("click", () => {
+            const card = button.closest(".open-when-card");
+            const isOpen = card.classList.toggle("open");
+            const action = button.querySelector(".open-when-action");
+
+            button.setAttribute("aria-expanded", String(isOpen));
+            if (action) action.textContent = isOpen
+                ? getUiText("closeLetter", "Свернуть")
+                : getUiText("openLetter", "Открыть письмо");
+        });
+    });
+}
+
+function renderLoveStats() {
+    if (!loveStatsContainer || typeof loveStatsData === "undefined") return;
+
+    toggleSectionVisibility("love-stats", loveStatsData.length > 0);
+
+    loveStatsContainer.innerHTML = loveStatsData.map((item) => {
+        const days = getCalendarDayDiff(item.date, item.mode);
+        const note = item.mode === "until" && days === 0
+            ? getUiText("loveStatsFinishedNote", "новая глава уже открыта")
+            : item.note;
+
+        return `
+            <article class="love-stat-card reveal">
+                <span class="love-stat-label">${escapeHtml(item.label)}</span>
+                <strong class="love-stat-number">${days}</strong>
+                <span class="love-stat-unit">${pluralizeDays(days)}</span>
+                <p>${escapeHtml(note)}</p>
+            </article>
+        `;
+    }).join("");
+}
+
+function renderFuturePlans() {
+    if (!futurePlansContainer || typeof futurePlansData === "undefined") return;
+
+    toggleSectionVisibility("future-plans", futurePlansData.length > 0);
+
+    futurePlansContainer.innerHTML = futurePlansData.map((item) => {
+        return `
+            <article class="future-card reveal">
+                <h3>${escapeHtml(item.title)}</h3>
+                <p>${escapeHtml(item.text)}</p>
+            </article>
+        `;
+    }).join("");
+}
+
+function renderFinalLetter() {
+    if (!finalLetter || typeof finalLetterData === "undefined") return;
+
+    const paragraphsData = finalLetterData.paragraphs || [];
+    const hasLetter = Boolean(finalLetterData.title || paragraphsData.length);
+    finalLetter.hidden = !hasLetter;
+    if (!hasLetter) return;
+
+    const paragraphs = paragraphsData.map((paragraph) => {
+        return `<p>${escapeHtml(paragraph)}</p>`;
+    }).join("");
+
+    finalLetter.innerHTML = `
+        <h3>${escapeHtml(finalLetterData.title)}</h3>
+        ${paragraphs}
+    `;
+}
+
+function renderGallery() {
+    if (!galleryContainer || typeof galleryData === "undefined") return;
+
+    toggleSectionVisibility("gallery", galleryData.length > 0);
+
+    galleryContainer.innerHTML = galleryData.map((item) => {
+        const classes = item.tall ? "gallery-card tall reveal" : "gallery-card reveal";
+
+        return `
+            <figure class="${classes}" data-full="${escapeHtml(item.full || item.image)}">
+                <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.alt || "")}" />
+                <figcaption>${escapeHtml(item.caption)}</figcaption>
+            </figure>
+        `;
+    }).join("");
+}
+
 function renderPoems() {
     if (!poemsContainer || typeof poemsData === "undefined") return;
+
+    toggleSectionVisibility("poems", poemsData.length > 0);
 
     poemsContainer.innerHTML = poemsData.map((poem) => {
         const poemHtml = poem.lines.map((line) => {
@@ -204,7 +453,7 @@ function renderPoems() {
                 </div>
                 <div class="poem-audio">
                     <button class="audio-button" data-audio="${escapeHtml(poem.audio)}" type="button">
-                        Послушать моим голосом
+                        ${escapeHtml(getUiText("poemPlay", "Послушать моим голосом"))}
                     </button>
                 </div>
             </article>
@@ -214,6 +463,8 @@ function renderPoems() {
 
 function renderVoiceNotes() {
     if (!voicesContainer || typeof voiceNotesData === "undefined") return;
+
+    toggleSectionVisibility("voices", voiceNotesData.length > 0);
 
     voicesContainer.innerHTML = voiceNotesData.map((item) => {
         return `
@@ -252,7 +503,7 @@ function bindPoemAudioButtons() {
             currentPoemButton = button;
 
             button.classList.add("playing");
-            button.textContent = "Остановить запись";
+            button.textContent = getUiText("poemStop", "Остановить запись");
 
             poemAudio.play().catch(() => {
                 stopCurrentPoemAudio();
@@ -293,14 +544,23 @@ function showSite() {
     waitingScreen.setAttribute("aria-hidden", "true");
     site.setAttribute("aria-hidden", "false");
 
-    document.title = "Хомячок × Зайка ♡";
+    applySiteContent("unlocked");
 
     unlockFavicon();
     applyExcitedSectionTexts();
     applyRelationshipStats();
+    renderStoryCards();
     renderTimeline();
+    renderReasons();
+    renderOpenWhenLetters();
+    bindOpenWhenLetters();
+    renderLoveStats();
+    renderFuturePlans();
+    renderFinalLetter();
+    renderGallery();
     renderPoems();
     renderVoiceNotes();
+    syncNavVisibility();
     bindVoicePlayers();
     bindPoemAudioButtons();
     bindPlaylistPause();
@@ -327,7 +587,7 @@ passwordForm?.addEventListener("submit", (event) => {
     const value = passwordInput.value.trim();
 
     if (value !== PASSWORD) {
-        passwordError.textContent = "Неверный пароль.";
+        passwordError.textContent = getUiText("passwordError", "Неверный пароль.");
         return;
     }
 
@@ -346,8 +606,13 @@ togglePassword?.addEventListener("click", () => {
     const isHidden = passwordInput.type === "password";
 
     passwordInput.type = isHidden ? "text" : "password";
-    togglePassword.textContent = isHidden ? "Скрыть" : "Показать";
-    togglePassword.setAttribute("aria-label", isHidden ? "Скрыть пароль" : "Показать пароль");
+    togglePassword.textContent = isHidden
+        ? getUiText("hidePassword", "Скрыть")
+        : getUiText("showPassword", "Показать");
+    togglePassword.setAttribute(
+        "aria-label",
+        isHidden ? getUiText("hidePassword", "Скрыть пароль") : getUiText("showPassword", "Показать пароль")
+    );
 });
 
 function startCountdown() {
@@ -356,7 +621,7 @@ function startCountdown() {
         const now = new Date();
         const diff = OPEN_DATE.getTime() - now.getTime();
         if (diff <= 0) {
-            countdown.textContent = "Время пришло.";
+            countdown.textContent = getUiText("countdownReady", "Время пришло.");
             if (!waitingAutoOpened) {
                 waitingAutoOpened = true;
                 clearInterval(countdownInterval);
@@ -374,7 +639,12 @@ function startCountdown() {
         const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
-        countdown.textContent = `${days} д ${hours} ч ${minutes} м ${seconds} с`;
+        countdown.textContent = [
+            `${days} ${getUiText("dayShort", "д")}`,
+            `${hours} ${getUiText("hourShort", "ч")}`,
+            `${minutes} ${getUiText("minuteShort", "м")}`,
+            `${seconds} ${getUiText("secondShort", "с")}`
+        ].join(" ");
     }
     updateCountdown();
     countdownInterval = setInterval(updateCountdown, 1000);
@@ -395,6 +665,8 @@ function setActiveNavLink() {
     let currentSectionId = "";
 
     sectionsForNav.forEach((section) => {
+        if (section.hidden) return;
+
         const sectionTop = section.offsetTop;
         const sectionHeight = section.offsetHeight;
 
@@ -442,15 +714,15 @@ async function startBgMusic() {
     try {
         await bgMusic.play();
         bgMusicStarted = true;
-        musicToggleBtn.textContent = "Выключить музыку";
+        musicToggleBtn.textContent = getUiText("musicOff", "Выключить музыку");
     } catch (error) {
-        musicToggleBtn.textContent = "Включить музыку";
+        musicToggleBtn.textContent = getUiText("musicOn", "Включить музыку");
     }
 }
 
 function pauseBgMusic() {
     bgMusic.pause();
-    musicToggleBtn.textContent = "Включить музыку";
+    musicToggleBtn.textContent = getUiText("musicOn", "Включить музыку");
 }
 
 function resumeBgMusic() {
@@ -459,7 +731,7 @@ function resumeBgMusic() {
 
     if (bgMusicStarted && !currentPoemAudio && !anyVoicePlaying) {
         bgMusic.play().catch(() => { });
-        musicToggleBtn.textContent = "Выключить музыку";
+        musicToggleBtn.textContent = getUiText("musicOff", "Выключить музыку");
     }
 }
 
@@ -568,4 +840,5 @@ document.addEventListener("keydown", (event) => {
 });
 
 /* ---------- INIT ---------- */
+applySiteContent();
 showEntryScreen();

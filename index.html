@@ -28,9 +28,9 @@
     <!-- ENTRY -->
     <section class="entry-screen active" id="entryScreen">
         <div class="entry-card">
-            <div class="entry-badge">private</div>
-            <h1 class="entry-title">Вход</h1>
-            <p class="entry-text">Это место открывается только по правильному коду.</p>
+            <div class="entry-badge" id="entryBadge">private</div>
+            <h1 class="entry-title" id="entryTitle">Вход</h1>
+            <p class="entry-text" id="entryText">Это место открывается только по правильному коду.</p>
 
             <form id="passwordForm" class="password-form" autocomplete="off">
                 <div class="password-field">
@@ -41,7 +41,7 @@
                     </button>
                 </div>
 
-                <button class="primary-button" type="submit">Открыть</button>
+                <button class="primary-button" id="passwordSubmitBtn" type="submit">Открыть</button>
                 <p id="passwordError" class="error-text" aria-live="polite"></p>
             </form>
         </div>
@@ -51,11 +51,11 @@
     <section class="waiting-screen" id="waitingScreen" aria-hidden="true">
         <div class="waiting-card">
             <div class="waiting-heart">♡</div>
-            <h2 class="waiting-title">Ещё не время</h2>
-            <p class="waiting-text">
+            <h2 class="waiting-title" id="waitingTitle">Ещё не время</h2>
+            <p class="waiting-text" id="waitingText">
                 Доступ к нашей истории откроется <strong>21 июня 2026 в 00:00</strong>.
             </p>
-            <p class="waiting-subtext">
+            <p class="waiting-subtext" id="waitingSubtext">
                 Всё самое важное приходит точно в свой момент.
             </p>
             <div class="countdown" id="countdown"></div>
@@ -66,7 +66,10 @@
     <div class="site" id="site" aria-hidden="true">
         <header class="header" id="top">
             <div class="container header-inner">
-                <a href="#hero" class="brand" id="brandSecret">Хомячок × Зайка</a>
+                <a href="#hero" class="brand" id="brandSecret">
+                    <img class="brand-logo" src="image/base/logo.png" alt="" aria-hidden="true" />
+                    <span id="brandTitle">Хомячок × Зайка</span>
+                </a>
 
                 <button class="nav-toggle" id="navToggle" aria-label="Открыть меню">
                     <span></span>
@@ -74,14 +77,14 @@
                 </button>
 
                 <nav class="nav" id="nav">
-                    <a href="#story-start">Начало</a>
-                    <a href="#timeline">Хронология</a>
-                    <a href="#gallery">Галерея</a>
-                    <a href="#excited-section">Притяжение</a>
-                    <a href="#poems">Стихи</a>
-                    <a href="#voices">Голосовые</a>
-                    <a href="#contract">Договор</a>
-                    <a href="#playlist">Плейлист</a>
+                    <a href="#story-start" id="navStoryStart">Начало</a>
+                    <a href="#timeline" id="navTimeline">Хронология</a>
+                    <a href="#gallery" id="navGallery">Галерея</a>
+                    <a href="#excited-section" id="navExcited">Притяжение</a>
+                    <a href="#poems" id="navPoems">Стихи</a>
+                    <a href="#voices" id="navVoices">Голосовые</a>
+                    <a href="#contract" id="navContract">Договор</a>
+                    <a href="#playlist" id="navPlaylist">Плейлист</a>
                 </nav>
             </div>
         </header>
@@ -91,27 +94,27 @@
             <section class="hero section" id="hero">
                 <div class="container hero-grid">
                     <div class="hero-copy reveal">
-                        <div class="section-kicker">private story archive</div>
-                        <h1 class="hero-title">Хомячок &amp; Зайка</h1>
-                        <p class="hero-lead">
+                        <div class="section-kicker" id="heroKicker">private story archive</div>
+                        <h1 class="hero-title" id="heroTitle">Хомячок &amp; Зайка</h1>
+                        <p class="hero-lead" id="heroLead">
                             Не просто сайт и не просто подборка моментов. А маленькое закрытое место,
                             в котором собрана наша история — всё важное, тёплое и живое.
                         </p>
 
                         <div class="hero-dates">
                             <div class="date-card">
-                                <span class="date-label">Дата знакомства</span>
+                                <span class="date-label" id="heroDateMetLabel">Дата знакомства</span>
                                 <span class="date-value" id="heroDateMet">21 ноября 2025</span>
                             </div>
 
                             <div class="date-card">
-                                <span class="date-label">Начало отношений</span>
+                                <span class="date-label" id="heroDateRelationshipLabel">Начало отношений</span>
                                 <span class="date-value" id="heroDateRelationship">18 февраля 2026</span>
                             </div>
 
                             <div class="date-card">
                                 <span class="date-label" id="heroStatLabel">Наша история</span>
-                                <span class="date-value" id="heroStatValue">2 месяца вместе</span>
+                                <span class="date-value" id="heroStatValue">4 месяца вместе</span>
                             </div>
                         </div>
 
@@ -119,7 +122,7 @@
                             <button class="primary-button" id="musicToggleBtn" type="button">
                                 Включить музыку
                             </button>
-                            <a class="ghost-button" href="#story-start">Открыть историю</a>
+                            <a class="ghost-button" id="heroStoryButton" href="#story-start">Открыть историю</a>
                         </div>
                     </div>
 
@@ -143,40 +146,15 @@
             <section class="section" id="story-start">
                 <div class="container">
                     <div class="section-heading reveal">
-                        <div class="section-kicker">начало</div>
-                        <h2 class="section-title">С чего всё началось</h2>
-                        <p class="section-text">
+                        <div class="section-kicker" id="storyKicker">начало</div>
+                        <h2 class="section-title" id="storyTitle">С чего всё началось</h2>
+                        <p class="section-text" id="storyText">
                             Некоторые истории выглядят совсем обычными в самом начале.
                             Но именно из таких маленьких моментов потом вырастает что-то настоящее.
                         </p>
                     </div>
 
-                    <div class="story-grid">
-                        <article class="story-card reveal">
-                            <div class="story-image">
-                                <img src="image/base/chat-start.png" alt="Начало переписки" />
-                            </div>
-                            <div class="story-card-body">
-                                <h3>Первый шаг</h3>
-                                <p>
-                                    Один из тех моментов, которые на вид совсем простые, а по факту
-                                    меняют очень многое.
-                                </p>
-                            </div>
-                        </article>
-
-                        <article class="story-card reveal">
-                            <div class="story-image">
-                                <img src="image/base/agreement-yes.png" alt="Согласие" class="agreement-image" />
-                            </div>
-                            <div class="story-card-body">
-                                <h3>Твоё «я готова»</h3>
-                                <p>
-                                    Тот самый момент, после которого всё стало уже не намёком, а реальностью.
-                                </p>
-                            </div>
-                        </article>
-                    </div>
+                    <div class="story-grid" id="storyCardsContainer"></div>
                 </div>
             </section>
 
@@ -184,11 +162,72 @@
             <section class="section soft-section" id="timeline">
                 <div class="container">
                     <div class="section-heading reveal">
-                        <div class="section-kicker">хронология</div>
-                        <h2 class="section-title">Наша линия времени</h2>
+                        <div class="section-kicker" id="timelineKicker">хронология</div>
+                        <h2 class="section-title" id="timelineTitle">Наша линия времени</h2>
                     </div>
 
                     <div class="timeline" id="timelineContainer"></div>
+                </div>
+            </section>
+
+            <!-- REASONS -->
+            <section class="section" id="reasons">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker" id="reasonsKicker">почему ты</div>
+                        <h2 class="section-title" id="reasonsTitle">Почему я выбираю тебя</h2>
+                        <p class="section-text" id="reasonsText">
+                            Не потому что так получилось. А потому что в тебе есть то, к чему хочется возвращаться
+                            каждый день.
+                        </p>
+                    </div>
+
+                    <div class="reasons-grid" id="reasonsContainer"></div>
+                </div>
+            </section>
+
+            <!-- OPEN WHEN -->
+            <section class="section soft-section" id="open-when">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker" id="openWhenKicker">открой когда</div>
+                        <h2 class="section-title" id="openWhenTitle">Маленькие письма для разных дней</h2>
+                        <p class="section-text" id="openWhenText">
+                            На случай, если тебе захочется немного моего голоса в тексте.
+                        </p>
+                    </div>
+
+                    <div class="open-when-grid" id="openWhenContainer"></div>
+                </div>
+            </section>
+
+            <!-- LOVE STATS -->
+            <section class="section" id="love-stats">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker" id="loveStatsKicker">мы в цифрах</div>
+                        <h2 class="section-title" id="loveStatsTitle">Сколько уже живёт наша история</h2>
+                        <p class="section-text" id="loveStatsText">
+                            Каждый день добавляет к нам что-то маленькое, но важное.
+                        </p>
+                    </div>
+
+                    <div class="love-stats-grid" id="loveStatsContainer"></div>
+                </div>
+            </section>
+
+            <!-- FUTURE PLANS -->
+            <section class="section soft-section" id="future-plans">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker" id="futurePlansKicker">дальше</div>
+                        <h2 class="section-title" id="futurePlansTitle">Наши будущие планы</h2>
+                        <p class="section-text" id="futurePlansText">
+                            Всё, что я хочу прожить с тобой не когда-нибудь абстрактно, а по-настоящему.
+                        </p>
+                    </div>
+
+                    <div class="future-grid" id="futurePlansContainer"></div>
                 </div>
             </section>
 
@@ -196,36 +235,11 @@
             <section class="section" id="gallery">
                 <div class="container">
                     <div class="section-heading reveal">
-                        <div class="section-kicker">галерея</div>
-                        <h2 class="section-title">Ты, от которой у меня сбивается дыхание</h2>
+                        <div class="section-kicker" id="galleryKicker">галерея</div>
+                        <h2 class="section-title" id="galleryTitle">Ты, от которой у меня сбивается дыхание</h2>
                     </div>
 
-                    <div class="gallery-grid">
-                        <figure class="gallery-card tall reveal" data-full="image/gallery/photo-soft-1.jpg">
-                            <img src="image/gallery/photo-soft-1.jpg" alt="Нежное фото 1" />
-                            <figcaption>Нежность</figcaption>
-                        </figure>
-
-                        <figure class="gallery-card reveal" data-full="image/gallery/photo-beauty-1.jpg">
-                            <img src="image/gallery/photo-beauty-1.jpg" alt="Красивое фото 1" />
-                            <figcaption>Красота</figcaption>
-                        </figure>
-
-                        <figure class="gallery-card reveal" data-full="image/gallery/photo-beauty-2.jpg">
-                            <img src="image/gallery/photo-beauty-2.jpg" alt="Красивое фото 2" />
-                            <figcaption>Магнетизм</figcaption>
-                        </figure>
-
-                        <figure class="gallery-card reveal" data-full="image/gallery/photo-morning.jpg">
-                            <img src="image/gallery/photo-morning.jpg" alt="Утреннее фото" />
-                            <figcaption>Только проснулась</figcaption>
-                        </figure>
-
-                        <figure class="gallery-card reveal" data-full="image/gallery/photo-soft-2.jpg">
-                            <img src="image/gallery/photo-soft-2.jpg" alt="Нежное фото 2" />
-                            <figcaption>Мягкость</figcaption>
-                        </figure>
-                    </div>
+                    <div class="gallery-grid" id="galleryContainer"></div>
                 </div>
             </section>
 
@@ -234,7 +248,7 @@
                 <div class="container">
                     <div class="excited-grid">
                         <div class="excited-copy reveal">
-                            <div class="section-kicker">притяжение</div>
+                            <div class="section-kicker" id="excitedKicker">притяжение</div>
                             <h2 class="section-title" id="excitedTitle">Тут будет твой заголовок</h2>
                             <p class="section-text" id="excitedText">
                                 Тут будет твой текст для этого раздела.
@@ -255,9 +269,9 @@
             <section class="section" id="poems">
                 <div class="container">
                     <div class="section-heading reveal">
-                        <div class="section-kicker">стихи</div>
-                        <h2 class="section-title">Мои стихи для тебя</h2>
-                        <p class="section-text">
+                        <div class="section-kicker" id="poemsKicker">стихи</div>
+                        <h2 class="section-title" id="poemsTitle">Мои стихи для тебя</h2>
+                        <p class="section-text" id="poemsText">
                             Здесь лежит то, что я когда-то написал для тебя. А под каждым стихотворением —
                             запись моим голосом.
                         </p>
@@ -271,9 +285,9 @@
             <section class="section soft-section" id="voices">
                 <div class="container">
                     <div class="section-heading reveal">
-                        <div class="section-kicker">голос</div>
-                        <h2 class="section-title">Твои голосовые</h2>
-                        <p class="section-text">
+                        <div class="section-kicker" id="voicesKicker">голос</div>
+                        <h2 class="section-title" id="voicesTitle">Твои голосовые</h2>
+                        <p class="section-text" id="voicesText">
                             Те самые маленькие живые кусочки, в которых ты звучишь по-настоящему.
                         </p>
                     </div>
@@ -286,9 +300,9 @@
             <section class="section" id="contract">
                 <div class="container">
                     <div class="section-heading reveal">
-                        <div class="section-kicker">договор</div>
-                        <h2 class="section-title">Договор о взаимном выборе</h2>
-                        <p class="section-text">
+                        <div class="section-kicker" id="contractKicker">договор</div>
+                        <h2 class="section-title" id="contractTitle">Договор о взаимном выборе</h2>
+                        <p class="section-text" id="contractText">
                             Здесь лежит уже не просто память, а официальный романтический документ,
                             который тоже стал частью нашей истории.
                         </p>
@@ -310,9 +324,9 @@
             <section class="section soft-section" id="playlist">
                 <div class="container">
                     <div class="section-heading reveal">
-                        <div class="section-kicker">музыка</div>
-                        <h2 class="section-title">То, что звучит как мы</h2>
-                        <p class="section-text">
+                        <div class="section-kicker" id="playlistKicker">музыка</div>
+                        <h2 class="section-title" id="playlistTitle">То, что звучит как мы</h2>
+                        <p class="section-text" id="playlistText">
                             Наш плейлист, в котором тоже лежит часть этой истории.
                         </p>
                     </div>
@@ -329,12 +343,13 @@
             <section class="section final-section" id="final">
                 <div class="container">
                     <div class="final-card reveal">
-                        <div class="section-kicker">финал</div>
-                        <h2 class="section-title">И это только начало</h2>
-                        <p class="section-text">
+                        <div class="section-kicker" id="finalKicker">финал</div>
+                        <h2 class="section-title" id="finalTitle">И это только начало</h2>
+                        <p class="section-text" id="finalText">
                             Пока что это всё. Но мне очень хочется, чтобы совсем скоро наша история
                             продолжалась, пополнялась новыми моментами и становилась всё больше и больше.
                         </p>
+                        <div class="final-letter" id="finalLetter"></div>
                         <button class="primary-button" id="scrollToTopBtn" type="button">Вернуться наверх</button>
                     </div>
                 </div>
@@ -353,8 +368,8 @@
     <!-- SECRET -->
     <div class="secret-message" id="secretMessage" aria-hidden="true">
         <div class="secret-message-card">
-            <div class="secret-message-kicker">secret</div>
-            <div class="secret-message-text">
+            <div class="secret-message-kicker" id="secretKicker">secret</div>
+            <div class="secret-message-text" id="secretText">
                 Ты уже слишком глубоко в моём сердце, чтобы оттуда выбраться ♡
             </div>
         </div>
