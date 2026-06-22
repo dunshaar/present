@@ -1,0 +1,10 @@
+{
+    "accessNotify": {
+        "enabled": true,
+        "endpoint": "https://present-web-access-notify.daniil-shabin.workers.dev",
+        "timeoutMs": 8000
+    },
+    "security": {
+        "accessSecret": "present-web-access-2026"
+    }
+}

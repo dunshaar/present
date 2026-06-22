@@ -51,6 +51,8 @@ let currentVoiceAudio = null;
 let currentVoiceElement = null;
 let currentPlaylistIframe = null;
 let playlistPauseBound = false;
+let siteConfigPromise = null;
+let accessNotificationSent = false;
 
 /* ---------- HELPERS ---------- */
 function escapeHtml(value) {
@@ -86,6 +88,155 @@ function getCalendarDayDiff(dateValue, mode = "since") {
     }
 
     return Math.max(diff, 0);
+}
+
+function fallbackSiteConfig() {
+    return {
+        accessNotify: {
+            enabled: false,
+            endpoint: "",
+            timeoutMs: 8000
+        },
+        security: {
+            accessSecret: ""
+        }
+    };
+}
+
+async function fetchSiteConfig() {
+    try {
+        const response = await fetch("info.json", { cache: "no-store" });
+        if (!response.ok) throw new Error("config");
+        return await response.json();
+    } catch {
+        return fallbackSiteConfig();
+    }
+}
+
+function getConnectionInfo() {
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
+    if (!connection) return null;
+
+    return {
+        effectiveType: connection.effectiveType || "",
+        downlink: connection.downlink || null,
+        rtt: connection.rtt || null,
+        saveData: Boolean(connection.saveData)
+    };
+}
+
+async function getUserAgentDetails() {
+    const uaData = navigator.userAgentData;
+
+    if (!uaData) return null;
+
+    const base = {
+        brands: uaData.brands || [],
+        mobile: Boolean(uaData.mobile),
+        platform: uaData.platform || ""
+    };
+
+    if (typeof uaData.getHighEntropyValues !== "function") return base;
+
+    try {
+        const details = await uaData.getHighEntropyValues([
+            "architecture",
+            "bitness",
+            "model",
+            "platformVersion",
+            "uaFullVersion"
+        ]);
+
+        return { ...base, ...details };
+    } catch {
+        return base;
+    }
+}
+
+async function buildAccessNotificationPayload(accessState) {
+    const uaDetails = await getUserAgentDetails();
+    const now = new Date();
+
+    return {
+        type: "present_web_access",
+        accessState,
+        timestamp: now.toISOString(),
+        localTime: now.toString(),
+        page: {
+            title: document.title,
+            url: window.location.href,
+            path: window.location.pathname,
+            referrer: document.referrer || ""
+        },
+        device: {
+            userAgent: navigator.userAgent || "",
+            userAgentData: uaDetails,
+            platform: navigator.platform || "",
+            vendor: navigator.vendor || "",
+            language: navigator.language || "",
+            languages: navigator.languages || [],
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+            touchPoints: navigator.maxTouchPoints || 0,
+            cookiesEnabled: navigator.cookieEnabled,
+            connection: getConnectionInfo()
+        },
+        screen: {
+            width: window.screen?.width || null,
+            height: window.screen?.height || null,
+            availWidth: window.screen?.availWidth || null,
+            availHeight: window.screen?.availHeight || null,
+            colorDepth: window.screen?.colorDepth || null,
+            pixelRatio: window.devicePixelRatio || 1
+        },
+        viewport: {
+            width: window.innerWidth,
+            height: window.innerHeight
+        }
+    };
+}
+
+async function postJsonWithTimeout(url, body, timeoutMs) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        return await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: JSON.stringify(body),
+            keepalive: true,
+            signal: controller.signal
+        });
+    } finally {
+        clearTimeout(timeout);
+    }
+}
+
+async function notifySuccessfulAccess(accessState) {
+    if (accessNotificationSent) return;
+    accessNotificationSent = true;
+
+    const config = siteConfigPromise ? await siteConfigPromise : fallbackSiteConfig();
+    const notify = config?.accessNotify || {};
+    const endpoint = notify.endpoint || "";
+
+    if (!notify.enabled || !endpoint) return;
+
+    try {
+        const payload = await buildAccessNotificationPayload(accessState);
+        payload.security = {
+            accessSecret: config?.security?.accessSecret || "",
+            honeypot: ""
+        };
+
+        await postJsonWithTimeout(endpoint, payload, Number(notify.timeoutMs || 8000));
+    } catch {
+        // Notification must never block opening the gift.
+    }
 }
 
 function getUiText(key, fallback = "") {
@@ -594,6 +745,8 @@ passwordForm?.addEventListener("submit", (event) => {
     passwordError.textContent = "";
 
     const now = new Date();
+    const accessState = now < OPEN_DATE ? "waiting_screen" : "site_opened";
+    notifySuccessfulAccess(accessState);
 
     if (now < OPEN_DATE) {
         showWaitingScreen();
@@ -840,5 +993,6 @@ document.addEventListener("keydown", (event) => {
 });
 
 /* ---------- INIT ---------- */
+siteConfigPromise = fetchSiteConfig();
 applySiteContent();
 showEntryScreen();
