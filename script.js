@@ -1,5 +1,13 @@
-const PASSWORD = "18.02.2026";
-const OPEN_DATE = new Date("2026-06-21T00:00:00");
+const PASSWORD = typeof siteSettings !== "undefined"
+    ? String(siteSettings.password || "")
+    : "18.02.2026";
+const OPEN_DATE = new Date(
+    typeof siteSettings !== "undefined"
+        ? siteSettings.openDate
+        : "2026-06-21T00:00:00"
+);
+const IS_LOCAL_PREVIEW = ["127.0.0.1", "localhost"].includes(window.location.hostname)
+    && new URLSearchParams(window.location.search).get("preview") === "1";
 
 const entryScreen = document.getElementById("entryScreen");
 const waitingScreen = document.getElementById("waitingScreen");
@@ -18,6 +26,7 @@ const sectionsForNav = document.querySelectorAll("main section[id]");
 
 const bgMusic = document.getElementById("bgMusic");
 const musicToggleBtn = document.getElementById("musicToggleBtn");
+const goodNightVideo = document.getElementById("goodNightVideo");
 
 const imageModal = document.getElementById("imageModal");
 const modalImage = document.getElementById("modalImage");
@@ -28,6 +37,8 @@ const scrollToTopBtn = document.getElementById("scrollToTopBtn");
 const brandSecret = document.getElementById("brandSecret");
 const secretMessage = document.getElementById("secretMessage");
 const heartRain = document.getElementById("heartRain");
+const contractSecretTrigger = document.getElementById("contractSecretTrigger");
+const playlistSecretTrigger = document.getElementById("playlistSecretTrigger");
 
 const poemsContainer = document.getElementById("poemsContainer");
 const voicesContainer = document.getElementById("voicesContainer");
@@ -49,10 +60,10 @@ let waitingAutoOpened = false;
 let secretResetTimeout = null;
 let currentVoiceAudio = null;
 let currentVoiceElement = null;
-let currentPlaylistIframe = null;
 let playlistPauseBound = false;
 let siteConfigPromise = null;
 let accessNotificationSent = false;
+let secretHideTimeout = null;
 
 /* ---------- HELPERS ---------- */
 function escapeHtml(value) {
@@ -252,6 +263,45 @@ function setTextById(id, value) {
     element.textContent = value;
 }
 
+function applySiteAssets() {
+    if (typeof siteAssets === "undefined") return;
+
+    const imageAssets = {
+        brandLogo: siteAssets.logo,
+        heroMainImage: siteAssets.heroMain,
+        heroTopImage: siteAssets.heroTop,
+        heroBottomImage: siteAssets.heroBottom,
+        excitedImage: siteAssets.excitedPhoto,
+        contractPage1Image: siteAssets.contractPage1,
+        contractPage2Image: siteAssets.contractPage2
+    };
+
+    Object.entries(imageAssets).forEach(([id, source]) => {
+        const image = document.getElementById(id);
+        if (image && source) image.src = source;
+    });
+
+    const musicSource = document.getElementById("bgMusicSource");
+    if (musicSource && siteAssets.backgroundMusic) {
+        musicSource.src = siteAssets.backgroundMusic;
+        bgMusic.load();
+    }
+
+    const videoSource = document.getElementById("goodNightVideoSource");
+    if (goodNightVideo) {
+        if (siteAssets.goodNightPoster) goodNightVideo.poster = siteAssets.goodNightPoster;
+        if (videoSource && siteAssets.goodNightVideo) {
+            videoSource.src = siteAssets.goodNightVideo;
+            goodNightVideo.load();
+        }
+    }
+
+    const playlistIframe = document.getElementById("playlistIframe");
+    if (playlistIframe && siteAssets.yandexPlaylistUrl) {
+        playlistIframe.src = siteAssets.yandexPlaylistUrl;
+    }
+}
+
 function applySiteContent(mode = "initial") {
     if (typeof siteContent === "undefined") return;
 
@@ -280,6 +330,12 @@ function applySiteContent(mode = "initial") {
 
     setTextById("passwordSubmitBtn", siteContent.ui?.openButton);
     setTextById("musicToggleBtn", siteContent.ui?.musicOn);
+    setTextById("navToggleLabel", siteContent.ui?.navToggle);
+}
+
+function isSectionEnabled(sectionId) {
+    if (typeof siteSettings === "undefined") return true;
+    return siteSettings.sections?.[sectionId] !== false;
 }
 
 function toggleSectionVisibility(sectionId, isVisible) {
@@ -287,7 +343,15 @@ function toggleSectionVisibility(sectionId, isVisible) {
 
     if (!section) return;
 
-    section.hidden = !isVisible;
+    section.hidden = !isVisible || !isSectionEnabled(sectionId);
+}
+
+function applyConfiguredSectionVisibility() {
+    document.querySelectorAll("main section[id]").forEach((section) => {
+        if (section.id !== "hero" && !isSectionEnabled(section.id)) {
+            section.hidden = true;
+        }
+    });
 }
 
 function syncNavVisibility() {
@@ -386,6 +450,19 @@ function bindPlaylistPause() {
     });
 
     playlistPauseBound = true;
+}
+
+function bindGoodNightVideo() {
+    if (!goodNightVideo || goodNightVideo.dataset.bound === "true") return;
+    goodNightVideo.dataset.bound = "true";
+
+    goodNightVideo.addEventListener("play", () => {
+        stopAllManagedAudio();
+        pauseBgMusic();
+    });
+
+    goodNightVideo.addEventListener("pause", resumeBgMusic);
+    goodNightVideo.addEventListener("ended", resumeBgMusic);
 }
 
 /* ---------- TEXT.JS SECTIONS ---------- */
@@ -711,10 +788,12 @@ function showSite() {
     renderGallery();
     renderPoems();
     renderVoiceNotes();
+    applyConfiguredSectionVisibility();
     syncNavVisibility();
     bindVoicePlayers();
     bindPoemAudioButtons();
     bindPlaylistPause();
+    bindGoodNightVideo();
     initGalleryModal();
     observeReveal();
     setActiveNavLink();
@@ -729,7 +808,10 @@ function unlockFavicon() {
         document.head.appendChild(favicon);
     }
 
-    favicon.href = `image/base/favicon-unlocked.ico?v=${Date.now()}`;
+    const faviconPath = typeof siteAssets !== "undefined" && siteAssets.favicon
+        ? siteAssets.favicon
+        : "image/base/favicon-unlocked.ico";
+    favicon.href = `${faviconPath}?v=${Date.now()}`;
 }
 
 passwordForm?.addEventListener("submit", (event) => {
@@ -745,10 +827,14 @@ passwordForm?.addEventListener("submit", (event) => {
     passwordError.textContent = "";
 
     const now = new Date();
-    const accessState = now < OPEN_DATE ? "waiting_screen" : "site_opened";
+    const dateLockActive = typeof siteSettings !== "undefined"
+        && siteSettings.lockEnabled !== false
+        && Number.isFinite(OPEN_DATE.getTime())
+        && now < OPEN_DATE;
+    const accessState = dateLockActive ? "waiting_screen" : "site_opened";
     notifySuccessfulAccess(accessState);
 
-    if (now < OPEN_DATE) {
+    if (dateLockActive) {
         showWaitingScreen();
     } else {
         showSite();
@@ -805,13 +891,23 @@ function startCountdown() {
 
 /* ---------- NAV ---------- */
 navToggle?.addEventListener("click", () => {
-    nav.classList.toggle("open");
+    const isOpen = nav.classList.toggle("open");
+    navToggle.setAttribute("aria-expanded", String(isOpen));
 });
 
 document.querySelectorAll(".nav a").forEach((link) => {
     link.addEventListener("click", () => {
         nav.classList.remove("open");
+        navToggle?.setAttribute("aria-expanded", "false");
     });
+});
+
+document.addEventListener("pointerdown", (event) => {
+    if (!nav?.classList.contains("open")) return;
+    if (nav.contains(event.target) || navToggle?.contains(event.target)) return;
+
+    nav.classList.remove("open");
+    navToggle?.setAttribute("aria-expanded", "false");
 });
 
 function setActiveNavLink() {
@@ -844,6 +940,11 @@ window.addEventListener("load", setActiveNavLink);
 /* ---------- REVEAL ---------- */
 function observeReveal() {
     const elements = document.querySelectorAll(".reveal:not(.in-view)");
+
+    if (IS_LOCAL_PREVIEW) {
+        elements.forEach((element) => element.classList.add("in-view"));
+        return;
+    }
 
     const observer = new IntersectionObserver(
         (entries) => {
@@ -907,7 +1008,7 @@ function openImageViewer(full) {
 function closeImageViewer() {
     imageModal.classList.remove("active");
     imageModal.setAttribute("aria-hidden", "true");
-    modalImage.src = "";
+    modalImage.removeAttribute("src");
     document.body.classList.remove("modal-open");
 }
 
@@ -950,7 +1051,14 @@ function spawnHeart() {
     setTimeout(() => heart.remove(), 6500);
 }
 
-function triggerSecret() {
+function triggerSecret(kicker, message) {
+    const secretKicker = document.getElementById("secretKicker");
+    const secretText = document.getElementById("secretText");
+
+    if (secretKicker && kicker) secretKicker.textContent = kicker;
+    if (secretText && message) secretText.textContent = message;
+
+    clearTimeout(secretHideTimeout);
     secretMessage.classList.add("active");
     secretMessage.setAttribute("aria-hidden", "false");
 
@@ -958,10 +1066,34 @@ function triggerSecret() {
         setTimeout(spawnHeart, i * 90);
     }
 
-    setTimeout(() => {
+    secretHideTimeout = setTimeout(() => {
         secretMessage.classList.remove("active");
         secretMessage.setAttribute("aria-hidden", "true");
     }, 3600);
+}
+
+function bindClickSecret(element, clickTarget, callback) {
+    if (!element) return;
+
+    let clicks = 0;
+    let resetTimeout = null;
+
+    element.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        clicks += 1;
+
+        clearTimeout(resetTimeout);
+        resetTimeout = setTimeout(() => {
+            clicks = 0;
+        }, 1800);
+
+        if (clicks < clickTarget) return;
+
+        clicks = 0;
+        clearTimeout(resetTimeout);
+        callback();
+    });
 }
 
 brandSecret?.addEventListener("click", (event) => {
@@ -976,7 +1108,10 @@ brandSecret?.addEventListener("click", (event) => {
 
     if (secretClicks >= 3) {
         secretClicks = 0;
-        triggerSecret();
+        triggerSecret(
+            siteContent.texts?.secretKicker,
+            siteContent.texts?.secretText
+        );
         window.scrollTo({
             top: 0,
             behavior: "smooth"
@@ -984,15 +1119,35 @@ brandSecret?.addEventListener("click", (event) => {
     }
 });
 
+bindClickSecret(contractSecretTrigger, 3, () => {
+    triggerSecret(
+        siteContent.texts?.contractSecretKicker,
+        siteContent.texts?.contractSecretText
+    );
+});
+
+bindClickSecret(playlistSecretTrigger, 3, () => {
+    triggerSecret(
+        siteContent.texts?.playlistSecretKicker,
+        siteContent.texts?.playlistSecretText
+    );
+});
+
 /* ---------- ESC ---------- */
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         closeImageViewer();
         nav.classList.remove("open");
+        navToggle?.setAttribute("aria-expanded", "false");
     }
 });
 
 /* ---------- INIT ---------- */
 siteConfigPromise = fetchSiteConfig();
+applySiteAssets();
 applySiteContent();
-showEntryScreen();
+if (IS_LOCAL_PREVIEW) {
+    showSite();
+} else {
+    showEntryScreen();
+}

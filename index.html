@@ -18,7 +18,7 @@
 
 <body>
     <audio id="bgMusic" loop preload="auto">
-        <source src="image/base/bg-music.mp3" type="audio/mpeg" />
+        <source id="bgMusicSource" src="image/base/bg-music.mp3" type="audio/mpeg" />
     </audio>
 
     <div class="bg-glow bg-glow-1"></div>
@@ -67,24 +67,34 @@
         <header class="header" id="top">
             <div class="container header-inner">
                 <a href="#hero" class="brand" id="brandSecret">
-                    <img class="brand-logo" src="image/base/logo.png" alt="" aria-hidden="true" />
+                    <img class="brand-logo" id="brandLogo" src="image/base/logo.png" alt="" aria-hidden="true" />
                     <span id="brandTitle">Хомячок × Зайка</span>
                 </a>
 
-                <button class="nav-toggle" id="navToggle" aria-label="Открыть меню">
-                    <span></span>
-                    <span></span>
+                <button class="nav-toggle" id="navToggle" type="button" aria-label="Открыть меню"
+                    aria-controls="nav" aria-expanded="false">
+                    <span class="nav-toggle-label" id="navToggleLabel">Разделы</span>
+                    <span class="nav-toggle-icon" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                    </span>
                 </button>
 
                 <nav class="nav" id="nav">
                     <a href="#story-start" id="navStoryStart">Начало</a>
                     <a href="#timeline" id="navTimeline">Хронология</a>
+                    <a href="#reasons" id="navReasons">Почему ты</a>
+                    <a href="#open-when" id="navOpenWhen">Письма</a>
+                    <a href="#love-stats" id="navLoveStats">В цифрах</a>
+                    <a href="#future-plans" id="navFuturePlans">Планы</a>
                     <a href="#gallery" id="navGallery">Галерея</a>
                     <a href="#excited-section" id="navExcited">Притяжение</a>
                     <a href="#poems" id="navPoems">Стихи</a>
                     <a href="#voices" id="navVoices">Голосовые</a>
+                    <a href="#good-night" id="navGoodNight">Перед сном</a>
                     <a href="#contract" id="navContract">Договор</a>
                     <a href="#playlist" id="navPlaylist">Плейлист</a>
+                    <a href="#final" id="navFinal">Финал</a>
                 </nav>
             </div>
         </header>
@@ -129,13 +139,13 @@
                     <div class="hero-side reveal">
                         <div class="hero-photo-stack">
                             <div class="hero-photo-card large">
-                                <img src="image/hero/hero-main.jpg" alt="Нежное фото" />
+                                <img id="heroMainImage" src="image/hero/hero-main.jpg" alt="Нежное фото" />
                             </div>
                             <div class="hero-photo-card small top">
-                                <img src="image/hero/hero-top.jpg" alt="Красивое фото" />
+                                <img id="heroTopImage" src="image/hero/hero-top.jpg" alt="Красивое фото" />
                             </div>
                             <div class="hero-photo-card small bottom">
-                                <img src="image/hero/hero-bottom.jpg" alt="Ещё одно нежное фото" />
+                                <img id="heroBottomImage" src="image/hero/hero-bottom.jpg" alt="Ещё одно нежное фото" />
                             </div>
                         </div>
                     </div>
@@ -259,7 +269,7 @@
                         </div>
 
                         <div class="excited-photo-card reveal">
-                            <img src="image/gallery/photo-excited.jpg" alt="Особенное фото" />
+                            <img id="excitedImage" src="image/gallery/photo-excited.jpg" alt="Особенное фото" />
                         </div>
                     </div>
                 </div>
@@ -296,8 +306,35 @@
                 </div>
             </section>
 
+            <!-- GOOD NIGHT VIDEO -->
+            <section class="section" id="good-night">
+                <div class="container">
+                    <div class="section-heading reveal">
+                        <div class="section-kicker" id="goodNightKicker">на ночь</div>
+                        <h2 class="section-title" id="goodNightTitle">Спокойной ночи, моя родная</h2>
+                        <p class="section-text" id="goodNightText">
+                            На случай, когда хочется не просто прочитать эти слова, а услышать их моим голосом
+                            и увидеть меня рядом хотя бы через экран.
+                        </p>
+                    </div>
+
+                    <figure class="good-night-card reveal">
+                        <div class="good-night-video-frame">
+                            <video id="goodNightVideo" controls playsinline preload="metadata"
+                                poster="last-key/poster.jpg">
+                                <source id="goodNightVideoSource" src="last-key/video.mp4" type="video/mp4" />
+                                Ваш браузер не поддерживает воспроизведение видео.
+                            </video>
+                        </div>
+                        <figcaption id="goodNightCaption">
+                            Я всё ещё рядом. Даже когда между нами экран.
+                        </figcaption>
+                    </figure>
+                </div>
+            </section>
+
             <!-- CONTRACT -->
-            <section class="section" id="contract">
+            <section class="section soft-section" id="contract">
                 <div class="container">
                     <div class="section-heading reveal">
                         <div class="section-kicker" id="contractKicker">договор</div>
@@ -310,18 +347,26 @@
 
                     <div class="contract-images">
                         <figure class="contract-image-card reveal">
-                            <img src="image/base/contract-page-1.png" alt="Договор, страница 1" />
+                            <img id="contractPage1Image" src="image/base/contract-page-1.png"
+                                alt="Договор, страница 1" />
                         </figure>
 
                         <figure class="contract-image-card reveal">
-                            <img src="image/base/contract-page-2.png" alt="Договор, страница 2" />
+                            <img id="contractPage2Image" src="image/base/contract-page-2.png"
+                                alt="Договор, страница 2" />
                         </figure>
                     </div>
+
+                    <button class="contract-secret-trigger reveal" id="contractSecretTrigger" type="button"
+                        aria-label="Печать договора" title="Печать договора">
+                        <span>18</span>
+                        <small>02</small>
+                    </button>
                 </div>
             </section>
 
             <!-- PLAYLIST -->
-            <section class="section soft-section" id="playlist">
+            <section class="section" id="playlist">
                 <div class="container">
                     <div class="section-heading reveal">
                         <div class="section-kicker" id="playlistKicker">музыка</div>
@@ -332,7 +377,10 @@
                     </div>
 
                     <div class="playlist-card reveal">
-                        <iframe frameborder="0" allow="clipboard-write" style="border:none;width:100%;height:520px;"
+                        <button class="playlist-secret-trigger" id="playlistSecretTrigger" type="button"
+                            aria-label="Маленький секрет" title="Маленький секрет">♡</button>
+                        <iframe id="playlistIframe" frameborder="0" allow="clipboard-write"
+                            style="border:none;width:100%;height:520px;"
                             src="https://music.yandex.ru/iframe/playlist/GO01102010GO/1025"
                             title="Плейлист Яндекс Музыки"></iframe>
                     </div>
@@ -361,7 +409,7 @@
     <div class="modal image-modal" id="imageModal" aria-hidden="true">
         <button class="modal-close" id="closeImageModal" aria-label="Закрыть">×</button>
         <div class="modal-content image-modal-content">
-            <img id="modalImage" src="" alt="Увеличенное изображение" />
+            <img id="modalImage" alt="Увеличенное изображение" />
         </div>
     </div>
 

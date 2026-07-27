@@ -28,3 +28,6 @@ node_modules/
 Thumbs.db
 
 text_to_json.py
+site_admin.py
+site_admin.command
+.site-admin-backups/
